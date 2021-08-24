@@ -180,7 +180,7 @@ StHelpBrowserPresenterTest >> testOpenIsWorkingSmokeTest [
 StHelpBrowserPresenterTest >> testOpenIsWorkingSmokeTestOnSpecificHelp [
 
 	| browser topic |
-	topic := HelpTopic named: 'Test'.
+	topic := StNodeHelpTopic named: 'Test'.
 	browser := self presenterClass on: topic.
 	self assert: browser rootTopic equals: topic.
 	window := browser openWithSpec
@@ -191,6 +191,8 @@ StHelpBrowserPresenterTest >> testOpenOnCustomHelp2 [
 
 	| browser rootTopic |
 	browser := self presenterClass on: CustomHelp2 asHelpTopic.
+	self flag: #toFix.
+	"return an help topic and not a nodeHelpTopic"
 	rootTopic := browser rootTopic.
 	self assert: rootTopic title equals: 'Help'.
 	self assert: rootTopic icon isNotNil.
@@ -296,57 +298,6 @@ StHelpBrowserPresenterTest >> testOpenOnSystemHelp2 [
 	window := browser openWithSpec
 ]
 
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testSearchList [
-
-	| browser text topics |
-	self skip.
-	browser := self presenterClass new.
-	text := '# section 1
-this is a paragraphe
-## section 2
-this is a paragraphe
-## section 3
-nothing
-#section 4
-this is a paragraphe'.
-	topics := (browser helpTopicVisitor new start:
-		           (MicroDownParser parse: text) asPillar) rootTopics.
-	self assert: (browser searchList: 'para' into: topics) size equals: 3
-]
-
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testSearchWordInTopics [
-
-	| browser topics text |
-	self skip.
-	browser := self presenterClass new.
-	text := '# section 1
-this is a paragraphe
-## section 2
-blabla
-# part 3
-lala'.
-	topics := (browser helpTopicVisitor new start:
-		           (MicroDownParser parse: text) asPillar) rootTopics.
-	self assert: (browser search: 'la' into: topics) size equals: 2
-]
-
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testSearchWordInTopicsTitle [
-
-	| browser topics |
-	self skip.
-	browser := self presenterClass new.
-	topics := OrderedCollection new.
-	topics
-		add: (self helpTopicClass named: 'section1');
-		add: (self helpTopicClass named: 'part 2');
-		add: (self helpTopicClass named: 'section 3').
-	(topics at: 2) addSubtopic: (self helpTopicClass named: 'section2').
-	self assert: (browser search: 'section' into: topics) size equals: 3
-]
-
 { #category : #tests }
 StHelpBrowserPresenterTest >> testSpHelpBrowserGotHelpTopicVisitorPerDefault [
 
@@ -371,7 +322,7 @@ StHelpBrowserPresenterTest >> testSpHelpBrowserGotRootTopicThatISpecify [
 
 	| topic browser |
 	browser := self presenterClass new.
-	topic := HelpTopic named: 'Test'.
+	topic := self helpTopicClass  named: 'Test'.
 	browser rootTopic: topic.
 	self assert: browser rootTopic equals: topic
 ]
@@ -390,7 +341,7 @@ StHelpBrowserPresenterTest >> testSpHelpBrowserGotTopicsThatISpecify [
 
 	| topic browser |
 	browser := self presenterClass new.
-	browser rootTopic: (HelpTopic named: 'foo').
+	browser rootTopic: (self helpTopicClass named: 'foo').
 	topic := browser rootTopic.
 	self assert: topic title equals: 'foo'
 ]
@@ -482,30 +433,4 @@ this is a text' ].
 	self assert: browser rootTopic title equals: 'Doc'.
 	self assert: browser rootTopic subtopics size equals: 1 ] ensure: [ 
 		self presenterClass helpCache: save ]
-]
-
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testWordInNode [
-
-	| browser text topic |
-	self skip.
-	browser := self presenterClass new.
-	text := '# section 1
-this is a paragraphe'.
-	topic := (browser helpTopicVisitor new start:
-		          (MicroDownParser parse: text) asPillar) rootTopics first.
-	self assert: (browser word: 'para' in: topic)
-]
-
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testWordNotInNode [
-
-	| browser text topic |
-	self skip.
-	browser := self presenterClass new.
-	text := '# section 1
-this is a paragraphe'.
-	topic := (browser helpTopicVisitor new start:
-		          (MicroDownParser parse: text) asPillar) rootTopics first.
-	self assert: (browser word: 'nothing' in: topic) not
 ]

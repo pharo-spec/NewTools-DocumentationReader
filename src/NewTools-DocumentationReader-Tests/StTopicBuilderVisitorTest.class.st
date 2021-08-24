@@ -273,7 +273,7 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 	self assert: visitor rootTopics first subtopics size equals: 1
 ]
 
-{ #category : #tests }
+{ #category : #helper }
 StTopicBuilderVisitorTest >> visitFile: file [
 
 	visitor start: (MicroDownParser new parse: file contents)
