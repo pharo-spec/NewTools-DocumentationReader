@@ -1,33 +1,26 @@
 "
 Execute the following code to open HelpBrowser on doc :
 ```
-MDSpNewHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
+StNewHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
 ```
 
-Execute the following code to charge doc in the cache :
+Execute the following code to load doc in the cache :
 ```
 | doc |
-doc := FileSystem disk workingDirectory / 'doc'.
-MDSpNewHelpBrowserPresenter internalizeHelpFrom: doc.
+doc := FileSystem workingDirectory / 'doc'.
+StNewHelpBrowserPresenter internalizeHelpFrom: doc.
 ```
-And to watch the cache inspect that :
+And to watch the cache inspect the following:
 ```
-MDSpNewHelpBrowserPresenter helpCache
-```
-
-After that you can also open the HelpBrowser with the helpCache :
-```
-| browser |
-browser := MDSpNewHelpBrowserPresenter new topicsFromSystem.
-MDSpNewHelpBrowserPresenter openOn: browser rootTopic
+StNewHelpBrowserPresenter helpCache
 ```
 
-to empty the cache execute the following code :
+To flush the cache execute the following code:
 ```
-MDSpNewHelpBrowserPresenter emptyHelpCache
+StNewHelpBrowserPresenter emptyHelpCache
 ```
 
-code to charge and use the cache :
+Code to load and use the cache:
 ```
 MDSpNewHelpBrowserPresenter internalizeHelpFrom: FileSystem disk workingDirectory / 'doc'.
 MDSpNewHelpBrowserPresenter open
@@ -59,10 +52,6 @@ StHelpBrowserPresenter class >> defaultSpec [
 				add: #topicList;
 				add: #textOutput;
 				yourself);
-			"add: (SpBoxLayout newLeftToRight
-				add: #searchInput withConstraints:  [ :constraints | constraints height: 18 ];
-				add: #nextButton withConstraints:  [ :constraints | constraints height: 18 ] ;
-				yourself);"
 			yourself
 ]
 
@@ -90,7 +79,7 @@ StHelpBrowserPresenter class >> helpCache [
 
 { #category : #accessing }
 StHelpBrowserPresenter class >> helpCache: aCache [
-	helpCache := aCache.
+	helpCache := aCache
 ]
 
 { #category : #cache }
@@ -155,11 +144,20 @@ StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 		inst:= self basicNew.
 		inst createTopicsFromCache.
 		^ inst 
-		setModelBeforeInitialization: inst rootTopic;
-		initialize;
-		openWithSpec;
-		yourself
+				setModelBeforeInitialization: inst rootTopic;
+				initialize;
+				openWithSpec;
+				yourself
 	 ]
+	
+]
+
+{ #category : #'instance creation' }
+StHelpBrowserPresenter class >> openOnHelpFolder [
+	"Open an help browser."
+	
+	self openOnHelpFolder: FileSystem workingDirectory / 'pharo-local' / 'doc'
+
 	
 ]
 
@@ -173,9 +171,9 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 
 	| inst fileReference |
 	inst := self basicNew.
-	aFileReference exists
-		ifFalse: [ fileReference := self helpCache ]
-		ifTrue: [ fileReference := aFileReference ].
+	fileReference := aFileReference exists
+		ifFalse: [  self helpCache ]
+		ifTrue: [ aFileReference ].
 	inst createRootTopicFromFolder: fileReference.
 	^ inst
 		  setModelBeforeInitialization: inst rootTopic;
@@ -213,7 +211,7 @@ StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
 	visitor := self helpTopicVisitor new.
-	visitor start: (MicroDownParser new parseFile: aFileOrFolder).
+	visitor start: (self parserClass new parseFile: aFileOrFolder).
 	^ visitor rootTopics
 ]
 
@@ -251,7 +249,7 @@ StHelpBrowserPresenter >> helpTopicClass [
 { #category : #accessing }
 StHelpBrowserPresenter >> helpTopicVisitor [
 	
-	helpTopicVisitor ifNil: [ ^ helpTopicVisitor := StTopicBuilderVisitor. ].
+	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
 	^ helpTopicVisitor
 ]
 
@@ -285,10 +283,6 @@ StHelpBrowserPresenter >> initializePresenters [
 			in: [ :this | this textArea readOnly: true ];
 			yourself);
 		yourself.
-	searchInput := self newTextInput.
-	nextButton := self newButton 
-						help: 'To select the next one';
-						label: 'Next'.
 
 
 
@@ -335,52 +329,12 @@ StHelpBrowserPresenter >> renderNode: aNode [
 
 { #category : #accessing }
 StHelpBrowserPresenter >> rootTopic [
-	^ rootTopic ifNil: [ self rootTopic: SystemHelp2 asHelpTopic. rootTopic ]
+	^ rootTopic ifNil: [ self rootTopic: (self helpTopicClass named: 'Help'). rootTopic ]
 ]
 
 { #category : #accessing }
 StHelpBrowserPresenter >> rootTopic: aHelpTopic [ 
 	rootTopic := aHelpTopic asHelpTopic
-]
-
-{ #category : #search }
-StHelpBrowserPresenter >> search: aString [
-
-	| topics |
-	topics := self rootTopic subtopics.
-	^ self search: aString into: topics. 
-]
-
-{ #category : #search }
-StHelpBrowserPresenter >> search: aString into: aTopicCollection [
-
-	| collection |
-	collection := OrderedCollection new.
-	aTopicCollection do: [ :topic | 
-		(self word: aString in: topic )
-			ifTrue: [ collection add: topic ]
-			ifFalse: [ collection addAll: (self search: aString into: topic subtopics) ] ].
-	^ collection
-]
-
-{ #category : #search }
-StHelpBrowserPresenter >> searchList: aString [
-
-	| topics |
-	topics := self rootTopic subtopics.
-	^ self searchList: aString into: topics. 
-]
-
-{ #category : #search }
-StHelpBrowserPresenter >> searchList: aString into: aTopicCollection [
-
-	| collection |
-	collection := OrderedCollection new.
-	aTopicCollection do: [ :topic | 
-		(self word: aString in: topic) 
-			ifTrue: [ collection add: topic ].
-		collection addAll: (self search: aString into: topic subtopics) ].
-	^ collection
 ]
 
 { #category : #initialization }
@@ -393,10 +347,8 @@ StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
 StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
-	sorted := SortedCollection sortBlock: [ :a :b | 
-		          a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | 
-			 e isDirectory or: [ e extension = 'mic' ] ]).
+	sorted := SortedCollection sortBlock: [ :a :b | a basename <= b basename ].
+	sorted addAll: (aFileOrFolder children select: [ :e | e isDirectory or: [ e extension = 'mic' ] ]).
 	^ sorted
 ]
 
@@ -408,10 +360,4 @@ StHelpBrowserPresenter >> title [
 { #category : #accessing }
 StHelpBrowserPresenter >> topicList [
 	^ topicList
-]
-
-{ #category : #search }
-StHelpBrowserPresenter >> word: aString in: aTopic [
-
-	^ (aTopic node text findString: aString startingAt: 1) > 0 | ((aTopic title findString: aString startingAt: 1) > 0)
 ]
