@@ -7,8 +7,8 @@ StNewHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'
 Execute the following code to load doc in the cache :
 ```
 | doc |
-doc := FileSystem workingDirectory / 'doc'.
-StNewHelpBrowserPresenter internalizeHelpFrom: doc.
+doc := FileSystem workingDirectory / 'pharo-local' / 'doc'.
+StHelpBrowserPresenter internalizeHelpFrom: doc.
 ```
 And to watch the cache inspect the following:
 ```
@@ -87,7 +87,7 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 	self filesystem: FileSystem memory.
 	[ aFolderOrFile isDirectory 
 		ifTrue:  [self filesystem createDirectory: aFolderOrFile basename. 
-					(aFolderOrFile children select: [ :e |  e isDirectory or: [ e extension = 'mic' ] ])
+					(aFolderOrFile children select: [ :e |  e isDirectory or: [ #('mic' 'md') includes: e extension ] ])
 						do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: aFolderOrFile basename ] ]
 		ifFalse: [ | file |
 					file := self filesystem workingDirectory / aFolderOrFile basename.
@@ -108,7 +108,7 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderN
 
 	aFolderOrFile isDirectory 
 		ifTrue:  [ | directoryPath |
-					directoryPath := aFolderName , '/' ,aFolderOrFile basename.
+					directoryPath := aFolderName , '/' , aFolderOrFile basename.
 					self filesystem createDirectory: directoryPath.
 					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
 		ifFalse: [ | file filePath |
@@ -220,7 +220,7 @@ StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
 
 	| subTopic sorted topic |
 	
-	(aFileOrFolder isFile and: aFileOrFolder extension = 'mic')
+	(aFileOrFolder isFile and: [ #('mic' 'md') includes: aFileOrFolder extension ])
 		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
 		
 	subTopic := OrderedCollection new.
@@ -348,7 +348,7 @@ StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
 	sorted := SortedCollection sortBlock: [ :a :b | a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | e isDirectory or: [ e extension = 'mic' ] ]).
+	sorted addAll: (aFileOrFolder children select: [ :e | e isDirectory or: [ #('mic' 'md') includes: e extension ] ]).
 	^ sorted
 ]
 
