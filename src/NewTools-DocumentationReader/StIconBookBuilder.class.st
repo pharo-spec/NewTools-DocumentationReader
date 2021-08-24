@@ -1,5 +1,5 @@
 Class {
-	#name : #IconBookBuilder,
+	#name : #StIconBookBuilder,
 	#superclass : #Object,
 	#instVars : [
 		'bookIcon',
@@ -9,25 +9,25 @@ Class {
 }
 
 { #category : #build }
-IconBookBuilder >> buildBookIcon: aTopic [
+StIconBookBuilder >> buildBookIcon: aTopic [
 
 	^ aTopic iconName: bookIcon
 ]
 
 { #category : #build }
-IconBookBuilder >> buildIcon: aTopic [
+StIconBookBuilder >> buildIcon: aTopic [
 
 	self buildBookIcon: aTopic
 ]
 
 { #category : #initialization }
-IconBookBuilder >> initialize [
+StIconBookBuilder >> initialize [
 	super initialize.
 	bookIcon := #bookIcon.
 	pageIcon := #pageIcon
 ]
 
 { #category : #build }
-IconBookBuilder >> setIconOf: aTopic [
+StIconBookBuilder >> setIconOf: aTopic [
 	^ aTopic iconName: pageIcon
 ]

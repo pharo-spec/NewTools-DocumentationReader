@@ -1,5 +1,5 @@
 Class {
-	#name : #MDTopicBuilderVisitorTest,
+	#name : #StTopicBuilderVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'filesystem',
@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileContentsLevelsSections [
+StTopicBuilderVisitorTest class >> spFileContentsLevelsSections [
 
 	^ '# Section 1
 blabla1
@@ -26,7 +26,7 @@ blabla6'
 ]
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileContentsMoreSections [
+StTopicBuilderVisitorTest class >> spFileContentsMoreSections [
 
 	^ '# Section 1
 blabla1
@@ -36,7 +36,7 @@ blabla2
 ]
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileContentsOneSection [
+StTopicBuilderVisitorTest class >> spFileContentsOneSection [
 
 	^ '# Section 1	
 _blabla_
@@ -45,7 +45,7 @@ blabla'
 ]
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileContentsWithMoreSubSection [
+StTopicBuilderVisitorTest class >> spFileContentsWithMoreSubSection [
 
 	^ '# Section 1
 blabla1
@@ -56,7 +56,7 @@ blabla3'
 ]
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileContentsWithOneSubSection [
+StTopicBuilderVisitorTest class >> spFileContentsWithOneSubSection [
 
 	^ '# Section 1
 blabla1
@@ -65,27 +65,27 @@ blabla2'
 ]
 
 { #category : #resources }
-MDTopicBuilderVisitorTest class >> spFileName [
+StTopicBuilderVisitorTest class >> spFileName [
 
 	^ 'test.md'
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> helpTopicClass [
+StTopicBuilderVisitorTest >> helpTopicClass [
 
-	^ MDNodeHelpTopic
+	^ StNodeHelpTopic
 ]
 
 { #category : #running }
-MDTopicBuilderVisitorTest >> setUp [
+StTopicBuilderVisitorTest >> setUp [
 	super setUp.
 	filesystem := FileSystem memory.
-	visitor := MDTopicBuilderVisitor new
+	visitor := StTopicBuilderVisitor new
 	
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testAddSubtopicsNodesAddPRDocumentInNodeTopic [
+StTopicBuilderVisitorTest >> testAddSubtopicsNodesAddPRDocumentInNodeTopic [
 
 	| topics |
 	topics := OrderedCollection new.
@@ -104,7 +104,7 @@ MDTopicBuilderVisitorTest >> testAddSubtopicsNodesAddPRDocumentInNodeTopic [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testAddSubtopicsNodesUseNodesList [
+StTopicBuilderVisitorTest >> testAddSubtopicsNodesUseNodesList [
 
 	| topics size |
 	topics := OrderedCollection new.
@@ -124,7 +124,7 @@ MDTopicBuilderVisitorTest >> testAddSubtopicsNodesUseNodesList [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testGetNodesListAfterAddObject [
+StTopicBuilderVisitorTest >> testGetNodesListAfterAddObject [
 
 	visitor 
 		nodesListAdd: 1;
@@ -135,13 +135,13 @@ MDTopicBuilderVisitorTest >> testGetNodesListAfterAddObject [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testGetNodesListAtInitialization [
+StTopicBuilderVisitorTest >> testGetNodesListAtInitialization [
 
 	self assert: visitor nodesList isEmpty
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitAllAddInNodesList [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitAllAddInNodesList [
 
 	| file text document |
 	text := '# SectionTest
@@ -157,7 +157,7 @@ This is a paragraphe'.
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
 
 	| file text header |
 	text := '# SectionTest
@@ -173,7 +173,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
 
 	| file text header |
 	text := '## SectionTest
@@ -189,7 +189,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 
 	| file topic |
 	(file := filesystem workingDirectory / self class spFileName) 
@@ -216,7 +216,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
 
 	| file |
 	(file := filesystem workingDirectory / self class spFileName) 
@@ -228,7 +228,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
 
 	| file |
 	(file := filesystem workingDirectory / self class spFileName) 
@@ -243,7 +243,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSection [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSection [
 
 	| file text |
 	text := '
@@ -259,7 +259,7 @@ blabla
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
+StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 
 	| file |
 	(file := filesystem workingDirectory / self class spFileName) 
@@ -274,7 +274,7 @@ MDTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 ]
 
 { #category : #tests }
-MDTopicBuilderVisitorTest >> visitFile: file [
+StTopicBuilderVisitorTest >> visitFile: file [
 
 	visitor start: (MicroDownParser new parse: file contents)
 ]

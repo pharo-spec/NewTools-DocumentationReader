@@ -249,13 +249,13 @@ StHelpBrowserPresenter >> dummyHelp [
 { #category : #utils }
 StHelpBrowserPresenter >> helpTopicClass [
 
-	^ MDNodeHelpTopic
+	^ StNodeHelpTopic
 ]
 
 { #category : #accessing }
 StHelpBrowserPresenter >> helpTopicVisitor [
 	
-	helpTopicVisitor ifNil: [ ^ helpTopicVisitor := MDTopicBuilderVisitor. ].
+	helpTopicVisitor ifNil: [ ^ helpTopicVisitor := StTopicBuilderVisitor. ].
 	^ helpTopicVisitor
 ]
 

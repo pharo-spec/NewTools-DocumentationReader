@@ -6,7 +6,7 @@ Note that I can have subtopics in addition to the microdown element.
 A subtopic is just similar to myself.
 "
 Class {
-	#name : #MDNodeHelpTopic,
+	#name : #StNodeHelpTopic,
 	#superclass : #HelpTopic,
 	#instVars : [
 		'node',
@@ -16,7 +16,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-MDNodeHelpTopic class >> named: aName with: anIconBuilder [
+StNodeHelpTopic class >> named: aName with: anIconBuilder [
 	| topic |
 	topic := self named: aName.
 	topic iconBuilder: anIconBuilder.
@@ -25,20 +25,20 @@ MDNodeHelpTopic class >> named: aName with: anIconBuilder [
 ]
 
 { #category : #adding }
-MDNodeHelpTopic >> addNode: aNode [
+StNodeHelpTopic >> addNode: aNode [
 
 	node addChild: aNode
 ]
 
 { #category : #adding }
-MDNodeHelpTopic >> addSubtopic: aSubTopic [
+StNodeHelpTopic >> addSubtopic: aSubTopic [
 
 	iconBuilder buildIcon: self.
 	super addSubtopic: aSubTopic
 ]
 
 { #category : #adding }
-MDNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
+StNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
 		
 	(aLevel - 1 > 1 and: [ self subtopics isNotEmpty] )
 		ifTrue: [ self subtopics last addSubtopic: aHelpTopic with: aLevel - 1 ] 
@@ -46,27 +46,27 @@ MDNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
 ]
 
 { #category : #accessing }
-MDNodeHelpTopic >> iconBuilder [ 
+StNodeHelpTopic >> iconBuilder [ 
 	^ iconBuilder
 ]
 
 { #category : #accessing }
-MDNodeHelpTopic >> iconBuilder: aIconBuilder [
+StNodeHelpTopic >> iconBuilder: aIconBuilder [
 
 	iconBuilder := aIconBuilder
 ]
 
 { #category : #initialize }
-MDNodeHelpTopic >> initialize [
+StNodeHelpTopic >> initialize [
 
 	super initialize.
 	node := MicRootBlock new.
-	iconBuilder := IconBookBuilder new.
+	iconBuilder := StIconBookBuilder new.
 	iconBuilder setIconOf: self
 ]
 
 { #category : #inspecting }
-MDNodeHelpTopic >> inspectionMCTopicTree [
+StNodeHelpTopic >> inspectionMCTopicTree [
 	<inspectorPresentationOrder: 930 title: 'TopicTree'>
 
 	^ SpTreePresenter new 
@@ -81,14 +81,14 @@ MDNodeHelpTopic >> inspectionMCTopicTree [
 ]
 
 { #category : #accessing }
-MDNodeHelpTopic >> node [
+StNodeHelpTopic >> node [
 	"Returns the microdown elements holding the document of the help"
 	
 	^ node
 ]
 
 { #category : #accessing }
-MDNodeHelpTopic >> subtopics: aCollection [
+StNodeHelpTopic >> subtopics: aCollection [
 
 	iconBuilder buildIcon: self.
 	super subtopics: aCollection

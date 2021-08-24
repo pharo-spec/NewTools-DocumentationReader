@@ -54,7 +54,7 @@ StHelpBrowserPresenterTest class >> spFileName [
 { #category : #'tests - search' }
 StHelpBrowserPresenterTest >> helpTopicClass [
 
-	^ MDNodeHelpTopic
+	^ StNodeHelpTopic
 ]
 
 { #category : #'tests - search' }
@@ -353,7 +353,7 @@ StHelpBrowserPresenterTest >> testSpHelpBrowserGotHelpTopicVisitorPerDefault [
 	| visitor browser |
 	browser := self presenterClass new.
 	visitor := browser helpTopicVisitor.
-	self assert: visitor equals: MDTopicBuilderVisitor
+	self assert: visitor equals: StTopicBuilderVisitor
 ]
 
 { #category : #tests }
@@ -361,9 +361,9 @@ StHelpBrowserPresenterTest >> testSpHelpBrowserGotHelpTopicVisitorThatISpecify [
 
 	| visitor browser |
 	browser := self presenterClass new.
-	browser helpTopicVisitor: MDTopicBuilderVisitor.
+	browser helpTopicVisitor: StTopicBuilderVisitor.
 	visitor := browser helpTopicVisitor.
-	self assert: visitor equals: MDTopicBuilderVisitor
+	self assert: visitor equals: StTopicBuilderVisitor
 ]
 
 { #category : #tests }

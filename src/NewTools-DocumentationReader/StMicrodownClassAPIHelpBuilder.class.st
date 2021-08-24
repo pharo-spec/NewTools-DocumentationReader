@@ -1,5 +1,5 @@
 Class {
-	#name : #MDMicrodownClassAPIHelpBuilder,
+	#name : #StMicrodownClassAPIHelpBuilder,
 	#superclass : #HelpBuilder,
 	#instVars : [
 		'addSubclasses',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : #building }
-MDMicrodownClassAPIHelpBuilder class >> buildHierarchicalHelpTopicFrom: aClass withSubclasses: aBoolean withMethods: anotherBoolean [
+StMicrodownClassAPIHelpBuilder class >> buildHierarchicalHelpTopicFrom: aClass withSubclasses: aBoolean withMethods: anotherBoolean [
 	"Start building from the given class"
 	
 	^ self new 
@@ -24,44 +24,44 @@ MDMicrodownClassAPIHelpBuilder class >> buildHierarchicalHelpTopicFrom: aClass w
 ]
 
 { #category : #building }
-MDMicrodownClassAPIHelpBuilder class >> sample [
+StMicrodownClassAPIHelpBuilder class >> sample [
 	<sampleInstance>
 	
 	StHelpBrowserPresenter openOn: (self buildHierarchicalHelpTopicFrom: SpPresenter withSubclasses: true withMethods: true)
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addMethods [
+StMicrodownClassAPIHelpBuilder >> addMethods [
 	^ addMethods
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addMethods: anObject [
+StMicrodownClassAPIHelpBuilder >> addMethods: anObject [
 	addMethods := anObject
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addMethodsWithoutComment [
+StMicrodownClassAPIHelpBuilder >> addMethodsWithoutComment [
 	^ addMethodsWithoutComment
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addMethodsWithoutComment: anObject [
+StMicrodownClassAPIHelpBuilder >> addMethodsWithoutComment: anObject [
 	addMethodsWithoutComment := anObject
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addSubclasses [
+StMicrodownClassAPIHelpBuilder >> addSubclasses [
 	^ addSubclasses
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> addSubclasses: anObject [
+StMicrodownClassAPIHelpBuilder >> addSubclasses: anObject [
 	addSubclasses := anObject
 ]
 
 { #category : #building }
-MDMicrodownClassAPIHelpBuilder >> build [
+StMicrodownClassAPIHelpBuilder >> build [
 
 	| builder |
 	builder := MicroDownParser builder.
@@ -78,7 +78,7 @@ MDMicrodownClassAPIHelpBuilder >> build [
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> buildMethodTopicsOn: topic for: aClass [
+StMicrodownClassAPIHelpBuilder >> buildMethodTopicsOn: topic for: aClass [
 
 	|stream methodComment|
 	stream := String new writeStream.
@@ -102,7 +102,7 @@ MDMicrodownClassAPIHelpBuilder >> buildMethodTopicsOn: topic for: aClass [
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> buildSubclassTopicFor: aSubclass [
+StMicrodownClassAPIHelpBuilder >> buildSubclassTopicFor: aSubclass [
 	 
 	^ self class new
 			rootToBuildFrom: aSubclass;
@@ -115,7 +115,7 @@ MDMicrodownClassAPIHelpBuilder >> buildSubclassTopicFor: aSubclass [
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> buildSubnodesForMethods [
+StMicrodownClassAPIHelpBuilder >> buildSubnodesForMethods [
 
 	| instanceSide classSide |
 	instanceSide := self topicClass named: 'Instance side'.
@@ -128,7 +128,7 @@ MDMicrodownClassAPIHelpBuilder >> buildSubnodesForMethods [
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> buildSubnodesForSubclasses [
+StMicrodownClassAPIHelpBuilder >> buildSubnodesForSubclasses [
 
 	| topic |
 	rootToBuildFrom subclasses isEmpty ifTrue: [ ^ self ].
@@ -146,18 +146,18 @@ MDMicrodownClassAPIHelpBuilder >> buildSubnodesForSubclasses [
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> iconBuilder [ 
+StMicrodownClassAPIHelpBuilder >> iconBuilder [ 
 	^ iconBuilder
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> iconBuilder: aIconBuilder [
+StMicrodownClassAPIHelpBuilder >> iconBuilder: aIconBuilder [
 
 	iconBuilder := aIconBuilder
 ]
 
 { #category : #initialization }
-MDMicrodownClassAPIHelpBuilder >> initialize [
+StMicrodownClassAPIHelpBuilder >> initialize [
 
 	"Initializes the receiver"
 
@@ -166,21 +166,21 @@ MDMicrodownClassAPIHelpBuilder >> initialize [
 	addMethods := true.
 	subclassesAsSeparateTopic := true.
 	addMethodsWithoutComment := true.
-	iconBuilder := IconClassBuilder new
+	iconBuilder := StIconClassBuilder new
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic [
+StMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic [
 	^ subclassesAsSeparateTopic
 ]
 
 { #category : #accessing }
-MDMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic: anObject [
+StMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic: anObject [
 	subclassesAsSeparateTopic := anObject
 ]
 
 { #category : #'private building' }
-MDMicrodownClassAPIHelpBuilder >> topicClass [
+StMicrodownClassAPIHelpBuilder >> topicClass [
 
-	^ MDNodeHelpTopic
+	^ StNodeHelpTopic
 ]

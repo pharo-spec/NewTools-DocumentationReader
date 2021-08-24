@@ -3,7 +3,7 @@ When I visit a header I create a NodeHelpTopic.
 When I visit something else I add it to the nodelist of the current node (help topic).
 "
 Class {
-	#name : #MDTopicBuilderVisitor,
+	#name : #StTopicBuilderVisitor,
 	#superclass : #MicrodownVisitor,
 	#instVars : [
 		'contents',
@@ -17,7 +17,7 @@ Class {
 }
 
 { #category : #adding }
-MDTopicBuilderVisitor >> addSubtopicsNodes: aSubtopicsCollection [
+StTopicBuilderVisitor >> addSubtopicsNodes: aSubtopicsCollection [
 
 	aSubtopicsCollection do: [ :each | 
 		nodesList first do: [ :node | each addNode: node ].
@@ -26,13 +26,13 @@ MDTopicBuilderVisitor >> addSubtopicsNodes: aSubtopicsCollection [
 ]
 
 { #category : #'visiting-document' }
-MDTopicBuilderVisitor >> helpTopicClass [
+StTopicBuilderVisitor >> helpTopicClass [
 
-	^ MDNodeHelpTopic
+	^ StNodeHelpTopic
 ]
 
 { #category : #initialization }
-MDTopicBuilderVisitor >> initialize [ 
+StTopicBuilderVisitor >> initialize [ 
 	
 	super initialize.
 	helpTopics := OrderedCollection new.
@@ -40,24 +40,24 @@ MDTopicBuilderVisitor >> initialize [
 ]
 
 { #category : #accessing }
-MDTopicBuilderVisitor >> nodesList [
+StTopicBuilderVisitor >> nodesList [
 
 	^ nodesList 
 ]
 
 { #category : #adding }
-MDTopicBuilderVisitor >> nodesListAdd: anObject [
+StTopicBuilderVisitor >> nodesListAdd: anObject [
 
 	nodesList add: anObject
 ]
 
 { #category : #accessing }
-MDTopicBuilderVisitor >> rootTopics [
+StTopicBuilderVisitor >> rootTopics [
 	^ helpTopics
 ]
 
 { #category : #visiting }
-MDTopicBuilderVisitor >> start: anObject [
+StTopicBuilderVisitor >> start: anObject [
 	"The normal case is to have
 	
 	#header 
@@ -80,7 +80,7 @@ MDTopicBuilderVisitor >> start: anObject [
 ]
 
 { #category : #'visiting-document' }
-MDTopicBuilderVisitor >> visitAll: aCollection [
+StTopicBuilderVisitor >> visitAll: aCollection [
 
 	| collection |
 	contents := OrderedCollection new.
@@ -96,7 +96,7 @@ MDTopicBuilderVisitor >> visitAll: aCollection [
 ]
 
 { #category : #'visiting-document' }
-MDTopicBuilderVisitor >> visitHeader: anObject [
+StTopicBuilderVisitor >> visitHeader: anObject [
 
 	(anObject level > 1 and: helpTopics isNotEmpty)
 		ifTrue: [ 
