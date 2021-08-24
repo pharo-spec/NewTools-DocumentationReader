@@ -6,7 +6,6 @@ Class {
 	#name : #StTopicBuilderVisitor,
 	#superclass : #MicrodownVisitor,
 	#instVars : [
-		'contents',
 		'helpTopics',
 		'nodesList'
 	],
@@ -82,15 +81,15 @@ StTopicBuilderVisitor >> start: anObject [
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> visitAll: aCollection [
 
-	| collection |
+	| collection contents |
 	contents := OrderedCollection new.
 	collection := aCollection collect: [ :each | 
-		              each class = MicHeaderBlock 
-							  ifTrue: [ 
-			              		self nodesListAdd: contents.
+		             each class = MicHeaderBlock 
+							 	ifTrue: [ 
+			              	self nodesListAdd: contents.
 			              		contents := OrderedCollection new.
 			              		self visit: each ].
-		              contents add: each ].
+		             contents add: each ].
 	self nodesList add: contents.
 	^ collection
 ]
@@ -98,12 +97,11 @@ StTopicBuilderVisitor >> visitAll: aCollection [
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> visitHeader: anObject [
 
-	(anObject level > 1 and: helpTopics isNotEmpty)
+	(anObject level > 1 and: [ helpTopics isNotEmpty])
 		ifTrue: [ 
 			helpTopics last
 				addSubtopic: (self helpTopicClass named: anObject header capitalized)
 				with: anObject level ]
 		ifFalse: [ 
-			helpTopics add:
-				(self helpTopicClass named: anObject header capitalized) ]
+			helpTopics add:(self helpTopicClass named: anObject header capitalized) ]
 ]

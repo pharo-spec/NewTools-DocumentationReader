@@ -37,10 +37,7 @@ Class {
 	#name : #StHelpBrowserPresenter,
 	#superclass : #SpPresenter,
 	#instVars : [
-		'helpText',
 		'textOutput',
-		'syntaxHelper',
-		'textInput',
 		'rootTopic',
 		'topicList',
 		'helpTopicVisitor',
@@ -194,9 +191,8 @@ StHelpBrowserPresenter >> connectPresenters [
 		whenSelectionChangedDo: [ :selection | 
 					| item node |
 					item := selection selectedItem.
-						node := item node.
-						 node ifNotNil: [
-							self renderNode: node ]];
+					node := item node.
+					node ifNotNil: [ self renderNode: node ]];
 				displayIcon: [ :each | each icon ]
 ]
 
