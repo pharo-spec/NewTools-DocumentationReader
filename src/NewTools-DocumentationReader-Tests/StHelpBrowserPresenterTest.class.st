@@ -77,20 +77,6 @@ StHelpBrowserPresenterTest >> tearDown [
 	super tearDown.
 ]
 
-{ #category : #'tests - search' }
-StHelpBrowserPresenterTest >> testFoundNoWords [
-
-	| browser topics |
-	browser := self presenterClass new.
-	topics := OrderedCollection new.
-	topics
-		add: (self helpTopicClass named: 'section1');
-		add: (self helpTopicClass named: 'part 2');
-		add: (self helpTopicClass named: 'section 3').
-	(topics at: 2) addSubtopic: (self helpTopicClass named: 'section2').
-	self assert: (browser search: 'aWord' into: topics) size equals: 0
-]
-
 { #category : #'tests - cache' }
 StHelpBrowserPresenterTest >> testHelpCache [
 

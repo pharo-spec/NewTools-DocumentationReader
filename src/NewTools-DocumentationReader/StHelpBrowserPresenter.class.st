@@ -33,9 +33,7 @@ Class {
 		'textOutput',
 		'rootTopic',
 		'topicList',
-		'helpTopicVisitor',
-		'searchInput',
-		'nextButton'
+		'helpTopicVisitor'
 	],
 	#classInstVars : [
 		'filesystem',
@@ -86,22 +84,11 @@ StHelpBrowserPresenter class >> helpCache: aCache [
 StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 
 	self filesystem: FileSystem memory.
-	[ aFolderOrFile isDirectory 
-		ifTrue:  [self filesystem createDirectory: aFolderOrFile basename. 
-					(aFolderOrFile children select: [ :e |  e isDirectory or: [ #('mic' 'md') includes: e extension ] ])
-						do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: aFolderOrFile basename ] ]
-		ifFalse: [ | file |
-					file := self filesystem workingDirectory / aFolderOrFile basename.
-					file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ].
-	self helpCache: self filesystem workingDirectory / aFolderOrFile basename.
-	] 
+	[ self internalizeHelpFrom: aFolderOrFile  at: filesystem workingDirectory basename.
+	self helpCache: self filesystem workingDirectory / aFolderOrFile basename ] 
 		on: FileDoesNotExistException 
-		do: [  "We do not do anything special because the only thing we could do is to reinitialize
-			and we may lose the contents there was one." ]
-		
-		
-	
-	
+		do: [  'We do not do anything special because the only thing we could do is to reinitialize
+			and we may lose the contents there was one.' ]
 ]
 
 { #category : #cache }
@@ -113,10 +100,11 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderN
 					self filesystem createDirectory: directoryPath.
 					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
 		ifFalse: [ | file filePath |
-					filePath := aFolderName , '/' , aFolderOrFile basename.
-					file := self filesystem workingDirectory / filePath.
-					file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ].
-	
+					(self new isMicFile: aFolderOrFile) 
+						ifTrue: [ 
+							filePath := aFolderName , '/' , aFolderOrFile basename.
+							file := self filesystem workingDirectory / filePath.
+							file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ] ]
 ]
 
 { #category : #'instance creation' }
@@ -195,53 +183,53 @@ StHelpBrowserPresenter >> connectPresenters [
 				displayIcon: [ :each | each icon ]
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createRootTopicFromFolder: aFolder [
 	| topic |
 	topic := (self createTopicsFromFileOrFolder: aFolder) first.
 	self rootTopic: topic.
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromCache [
 	self createRootTopicFromFolder: self class helpCache.
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
 	visitor := self helpTopicVisitor new.
-	visitor start: (self parserClass new parseFile: aFileOrFolder).
-	^ visitor rootTopics
+	visitor visit: (self parserClass new parseFile: aFileOrFolder).
+	^ visitor helpTopics subtopics
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
 
 	| subTopic sorted topic |
-	
-	(aFileOrFolder isFile and: [ #('mic' 'md') includes: aFileOrFolder extension ])
+	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
 		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
-		
-	subTopic := OrderedCollection new.
-	topic := self helpTopicClass named: aFileOrFolder basenameWithoutExtension capitalized.
+
+	topic := self helpTopicClass named:
+		         aFileOrFolder basenameWithoutExtension capitalized.
 	sorted := self sortFileAndFolder: aFileOrFolder.
 	sorted do: [ :fileOrFolder | 
 		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
 			topic addSubtopic: each ] ].
+	subTopic := OrderedCollection new.
 	subTopic add: topic.
 	^ subTopic
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> dummyHelp [
 
 	^  '# Empty Help
 	This a dummy help.'
 ]
 
-{ #category : #utils }
+{ #category : #hooks }
 StHelpBrowserPresenter >> helpTopicClass [
 
 	^ StNodeHelpTopic
@@ -290,18 +278,24 @@ StHelpBrowserPresenter >> initializePresenters [
 
 ]
 
-{ #category : #utils }
+{ #category : #testing }
+StHelpBrowserPresenter >> isMicFile: aFile [
+
+	^ #( 'mic' 'md' ) includes: aFile extension
+]
+
+{ #category : #hooks }
 StHelpBrowserPresenter >> morphWriter [
 
 	^ MicRichTextComposer new
 ]
 
-{ #category : #utils }
+{ #category : #hooks }
 StHelpBrowserPresenter >> parserClass [ 
 	^ MicroDownParser
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> render [
 
 	| document |
@@ -309,20 +303,20 @@ StHelpBrowserPresenter >> render [
 	textOutput morph setText: (self morphWriter start: document)
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> render: aString [
 
 	| document text |
-	aString 
-		ifNil: [ text := self dummyHelp ]
-		ifNotNil: [ text := aString ].
+	text := aString 
+		ifNil: [ self dummyHelp ]
+		ifNotNil: [ aString ].
 	 document := [ self parserClass parse: text ] 
 							on: MicParsingError
 							do: [ :ex | textOutput morph setText: text. ^ self ].
 	textOutput morph setText: (self morphWriter start: document) 
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> renderNode: aNode [
 
 	textOutput morph setText: (self morphWriter visit: aNode)
@@ -344,12 +338,14 @@ StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
 	rootTopic := anHelpTopic
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
-	sorted := SortedCollection sortBlock: [ :a :b | a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | e isDirectory or: [ #('mic' 'md') includes: e extension ] ]).
+	sorted := SortedCollection sortBlock: [ :a :b | 
+		          a basename <= b basename ].
+	sorted addAll: (aFileOrFolder children select: [ :e | 
+			 e isDirectory or: [ self isMicFile: e ] ]).
 	^ sorted
 ]
 
