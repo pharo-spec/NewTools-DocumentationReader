@@ -211,24 +211,24 @@ StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
 	visitor := self helpTopicVisitor new.
-	visitor start: (self parserClass new parseFile: aFileOrFolder).
-	^ visitor rootTopics
+	visitor visit: (self parserClass new parseFile: aFileOrFolder).
+	^ visitor helpTopics subtopics
 ]
 
 { #category : #utils }
 StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
 
 	| subTopic sorted topic |
-	
-	(aFileOrFolder isFile and: [ #('mic' 'md') includes: aFileOrFolder extension ])
+	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
 		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
-		
-	subTopic := OrderedCollection new.
-	topic := self helpTopicClass named: aFileOrFolder basenameWithoutExtension capitalized.
+
+	topic := self helpTopicClass named:
+		         aFileOrFolder basenameWithoutExtension capitalized.
 	sorted := self sortFileAndFolder: aFileOrFolder.
 	sorted do: [ :fileOrFolder | 
 		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
 			topic addSubtopic: each ] ].
+	subTopic := OrderedCollection new.
 	subTopic add: topic.
 	^ subTopic
 ]
@@ -290,6 +290,12 @@ StHelpBrowserPresenter >> initializePresenters [
 ]
 
 { #category : #utils }
+StHelpBrowserPresenter >> isMicFile: aFile [
+
+	^ #( 'mic' 'md' ) includes: aFile extension
+]
+
+{ #category : #utils }
 StHelpBrowserPresenter >> morphWriter [
 
 	^ MicRichTextComposer new
@@ -347,8 +353,10 @@ StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
 StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
-	sorted := SortedCollection sortBlock: [ :a :b | a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | e isDirectory or: [ #('mic' 'md') includes: e extension ] ]).
+	sorted := SortedCollection sortBlock: [ :a :b | 
+		          a basename <= b basename ].
+	sorted addAll: (aFileOrFolder children select: [ :e | 
+			 e isDirectory or: [ self isMicFile: e ] ]).
 	^ sorted
 ]
 
