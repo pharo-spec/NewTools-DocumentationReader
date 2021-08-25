@@ -22,8 +22,8 @@ StNewHelpBrowserPresenter emptyHelpCache
 
 Code to load and use the cache:
 ```
-MDSpNewHelpBrowserPresenter internalizeHelpFrom: FileSystem disk workingDirectory / 'doc'.
-MDSpNewHelpBrowserPresenter open
+StHelpBrowserPresenter internalizeHelpFrom: FileSystem disk workingDirectory / 'doc'.
+StNewHelpBrowserPresenter open
 ```
 "
 Class {
@@ -84,6 +84,7 @@ StHelpBrowserPresenter class >> helpCache: aCache [
 
 { #category : #cache }
 StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
+
 	self filesystem: FileSystem memory.
 	[ aFolderOrFile isDirectory 
 		ifTrue:  [self filesystem createDirectory: aFolderOrFile basename. 
@@ -123,7 +124,7 @@ StHelpBrowserPresenter class >> open [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	^ self openOnHelpFolder: helpCache 
+	^ self openOnHelpFolder: self helpCache 
 ]
 
 { #category : #'instance creation' }
