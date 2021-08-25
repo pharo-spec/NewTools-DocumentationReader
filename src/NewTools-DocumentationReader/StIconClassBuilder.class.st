@@ -1,3 +1,6 @@
+"
+I set the icon of topic with a class icon
+"
 Class {
 	#name : #StIconClassBuilder,
 	#superclass : #Object,

@@ -1,3 +1,7 @@
+"
+I set pageIcon when the topic has not subtopics.
+I set bookIcon when the topic has subtopics.
+"
 Class {
 	#name : #StIconBookBuilder,
 	#superclass : #Object,
