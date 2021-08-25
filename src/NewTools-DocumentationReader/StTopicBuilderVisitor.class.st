@@ -9,9 +9,6 @@ Class {
 		'helpTopics',
 		'actualTopic'
 	],
-	#classInstVars : [
-		'helpCache'
-	],
 	#category : #'NewTools-DocumentationReader'
 }
 
