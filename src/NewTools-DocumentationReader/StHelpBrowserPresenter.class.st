@@ -33,9 +33,7 @@ Class {
 		'textOutput',
 		'rootTopic',
 		'topicList',
-		'helpTopicVisitor',
-		'searchInput',
-		'nextButton'
+		'helpTopicVisitor'
 	],
 	#classInstVars : [
 		'filesystem',
@@ -88,8 +86,8 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 	[ self internalizeHelpFrom: aFolderOrFile  at: filesystem workingDirectory basename.
 	self helpCache: self filesystem workingDirectory / aFolderOrFile basename ] 
 		on: FileDoesNotExistException 
-		do: [  "We do not do anything special because the only thing we could do is to reinitialize
-			and we may lose the contents there was one." ]
+		do: [  'We do not do anything special because the only thing we could do is to reinitialize
+			and we may lose the contents there was one.' ]
 ]
 
 { #category : #cache }
@@ -184,19 +182,19 @@ StHelpBrowserPresenter >> connectPresenters [
 				displayIcon: [ :each | each icon ]
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createRootTopicFromFolder: aFolder [
 	| topic |
 	topic := (self createTopicsFromFileOrFolder: aFolder) first.
 	self rootTopic: topic.
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromCache [
 	self createRootTopicFromFolder: self class helpCache.
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
@@ -205,7 +203,7 @@ StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 	^ visitor helpTopics subtopics
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
 
 	| subTopic sorted topic |
@@ -223,14 +221,14 @@ StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
 	^ subTopic
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> dummyHelp [
 
 	^  '# Empty Help
 	This a dummy help.'
 ]
 
-{ #category : #utils }
+{ #category : #hooks }
 StHelpBrowserPresenter >> helpTopicClass [
 
 	^ StNodeHelpTopic
@@ -279,24 +277,24 @@ StHelpBrowserPresenter >> initializePresenters [
 
 ]
 
-{ #category : #utils }
+{ #category : #testing }
 StHelpBrowserPresenter >> isMicFile: aFile [
 
 	^ #( 'mic' 'md' ) includes: aFile extension
 ]
 
-{ #category : #utils }
+{ #category : #hooks }
 StHelpBrowserPresenter >> morphWriter [
 
 	^ MicRichTextComposer new
 ]
 
-{ #category : #utils }
+{ #category : #hooks }
 StHelpBrowserPresenter >> parserClass [ 
 	^ MicroDownParser
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> render [
 
 	| document |
@@ -304,20 +302,20 @@ StHelpBrowserPresenter >> render [
 	textOutput morph setText: (self morphWriter start: document)
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> render: aString [
 
 	| document text |
-	aString 
-		ifNil: [ text := self dummyHelp ]
-		ifNotNil: [ text := aString ].
+	text := aString 
+		ifNil: [ self dummyHelp ]
+		ifNotNil: [ aString ].
 	 document := [ self parserClass parse: text ] 
 							on: MicParsingError
 							do: [ :ex | textOutput morph setText: text. ^ self ].
 	textOutput morph setText: (self morphWriter start: document) 
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> renderNode: aNode [
 
 	textOutput morph setText: (self morphWriter visit: aNode)
@@ -339,7 +337,7 @@ StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
 	rootTopic := anHelpTopic
 ]
 
-{ #category : #utils }
+{ #category : #internals }
 StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
