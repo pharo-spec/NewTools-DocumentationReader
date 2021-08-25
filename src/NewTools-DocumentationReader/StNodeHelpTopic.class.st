@@ -40,7 +40,7 @@ StNodeHelpTopic >> addSubtopic: aSubTopic [
 { #category : #adding }
 StNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
 		
-	(aLevel - 1 > 1 and: [ self subtopics isNotEmpty] )
+	(aLevel > 1 and: [ self subtopics isNotEmpty] )
 		ifTrue: [ self subtopics last addSubtopic: aHelpTopic with: aLevel - 1 ] 
 		ifFalse: [ self addSubtopic: aHelpTopic ]
 ]
