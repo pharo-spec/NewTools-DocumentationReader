@@ -85,22 +85,11 @@ StHelpBrowserPresenter class >> helpCache: aCache [
 { #category : #cache }
 StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 	self filesystem: FileSystem memory.
-	[ aFolderOrFile isDirectory 
-		ifTrue:  [self filesystem createDirectory: aFolderOrFile basename. 
-					(aFolderOrFile children select: [ :e |  e isDirectory or: [ #('mic' 'md') includes: e extension ] ])
-						do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: aFolderOrFile basename ] ]
-		ifFalse: [ | file |
-					file := self filesystem workingDirectory / aFolderOrFile basename.
-					file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ].
-	self helpCache: self filesystem workingDirectory / aFolderOrFile basename.
-	] 
+	[ self internalizeHelpFrom: aFolderOrFile  at: filesystem workingDirectory basename.
+	self helpCache: self filesystem workingDirectory / aFolderOrFile basename ] 
 		on: FileDoesNotExistException 
 		do: [  "We do not do anything special because the only thing we could do is to reinitialize
 			and we may lose the contents there was one." ]
-		
-		
-	
-	
 ]
 
 { #category : #cache }
@@ -112,10 +101,11 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderN
 					self filesystem createDirectory: directoryPath.
 					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
 		ifFalse: [ | file filePath |
-					filePath := aFolderName , '/' , aFolderOrFile basename.
-					file := self filesystem workingDirectory / filePath.
-					file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ].
-	
+					(self new isMicFile: aFolderOrFile) 
+						ifTrue: [ 
+							filePath := aFolderName , '/' , aFolderOrFile basename.
+							file := self filesystem workingDirectory / filePath.
+							file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ] ]
 ]
 
 { #category : #'instance creation' }
