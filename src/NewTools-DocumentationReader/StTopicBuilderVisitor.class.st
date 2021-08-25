@@ -7,7 +7,7 @@ Class {
 	#superclass : #MicrodownVisitor,
 	#instVars : [
 		'helpTopics',
-		'nodesList'
+		'actualTopic'
 	],
 	#classInstVars : [
 		'helpCache'
@@ -15,48 +15,27 @@ Class {
 	#category : #'NewTools-DocumentationReader'
 }
 
-{ #category : #adding }
-StTopicBuilderVisitor >> addSubtopicsNodes: aSubtopicsCollection [
-
-	aSubtopicsCollection do: [ :each | 
-		nodesList first do: [ :node | each addNode: node ].
-		nodesList removeFirst.
-		self addSubtopicsNodes: each subtopics ]
-]
-
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> helpTopicClass [
 
 	^ StNodeHelpTopic
 ]
 
+{ #category : #accessing }
+StTopicBuilderVisitor >> helpTopics [
+	^ helpTopics
+]
+
 { #category : #initialization }
 StTopicBuilderVisitor >> initialize [ 
 	
 	super initialize.
-	helpTopics := OrderedCollection new.
-	nodesList := LinkedList new.
+	helpTopics := StNodeHelpTopic new.
+	actualTopic := helpTopics
 ]
 
-{ #category : #accessing }
-StTopicBuilderVisitor >> nodesList [
-
-	^ nodesList 
-]
-
-{ #category : #adding }
-StTopicBuilderVisitor >> nodesListAdd: anObject [
-
-	nodesList add: anObject
-]
-
-{ #category : #accessing }
-StTopicBuilderVisitor >> rootTopics [
-	^ helpTopics
-]
-
-{ #category : #visiting }
-StTopicBuilderVisitor >> start: anObject [
+{ #category : #'visiting-document' }
+StTopicBuilderVisitor >> visit: anObject [
 	"The normal case is to have
 	
 	#header 
@@ -72,8 +51,6 @@ StTopicBuilderVisitor >> start: anObject [
 	"
 	
 	self visitAll: anObject children.
-	nodesList removeFirst.
-	self addSubtopicsNodes: helpTopics 
 	
 	
 ]
@@ -81,27 +58,20 @@ StTopicBuilderVisitor >> start: anObject [
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> visitAll: aCollection [
 
-	| collection contents |
-	contents := OrderedCollection new.
-	collection := aCollection collect: [ :each | 
-		             each class = MicHeaderBlock 
-							 	ifTrue: [ 
-			              	self nodesListAdd: contents.
-			              		contents := OrderedCollection new.
-			              		self visit: each ].
-		             contents add: each ].
-	self nodesList add: contents.
-	^ collection
+	aCollection do: [ :each |
+		each accept: self.
+		actualTopic addNode: each ].
+	^ helpTopics
+	
+	
 ]
 
 { #category : #'visiting-document' }
-StTopicBuilderVisitor >> visitHeader: anObject [
+StTopicBuilderVisitor >> visitHeader: aHeader [
 
-	(anObject level > 1 and: [ helpTopics isNotEmpty])
-		ifTrue: [ 
-			helpTopics last
-				addSubtopic: (self helpTopicClass named: anObject header capitalized)
-				with: anObject level ]
-		ifFalse: [ 
-			helpTopics add:(self helpTopicClass named: anObject header capitalized) ]
+	aHeader level < 3 ifTrue:[
+		| topic |
+		topic := self helpTopicClass named: aHeader header capitalized.
+		actualTopic := topic.
+		helpTopics addSubtopic: topic with: aHeader level ]
 ]
