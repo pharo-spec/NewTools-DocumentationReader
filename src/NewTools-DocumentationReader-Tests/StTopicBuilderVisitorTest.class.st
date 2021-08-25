@@ -85,78 +85,6 @@ StTopicBuilderVisitorTest >> setUp [
 ]
 
 { #category : #tests }
-StTopicBuilderVisitorTest >> testAddSubtopicsNodesAddPRDocumentInNodeTopic [
-
-	| topics |
-	topics := OrderedCollection new.
-	topics
-		add: (self helpTopicClass named: '1');
-		add: (self helpTopicClass named: '2');
-		add: (self helpTopicClass named: '3').
-	visitor
-		nodesListAdd: (OrderedCollection new: 1);
-		nodesListAdd: (OrderedCollection new: 2);
-		nodesListAdd: (OrderedCollection new: 3).
-	visitor addSubtopicsNodes: topics.
-	self assert: topics first node class equals: MicRootBlock.
-	self assert: topics second node class equals: MicRootBlock.
-	self assert: topics third node class equals: MicRootBlock
-]
-
-{ #category : #tests }
-StTopicBuilderVisitorTest >> testAddSubtopicsNodesUseNodesList [
-
-	| topics size |
-	topics := OrderedCollection new.
-	topics 
-		add: (HelpTopic named: '1');
-		add: (HelpTopic named: '2');
-		add: (HelpTopic named: '3').
-	visitor 
-		nodesListAdd: (OrderedCollection new: 1);
-		nodesListAdd: (OrderedCollection new: 2);
-		nodesListAdd: (OrderedCollection new: 3);
-		nodesListAdd: (OrderedCollection new: 4).
-	size := visitor nodesList size.
-	visitor addSubtopicsNodes: topics.
-	self assert: visitor nodesList size equals: size - 3 
-
-]
-
-{ #category : #tests }
-StTopicBuilderVisitorTest >> testGetNodesListAfterAddObject [
-
-	visitor 
-		nodesListAdd: 1;
-		nodesListAdd: 2.
-	self assert: visitor nodesList size equals: 2.
-	self assert: visitor nodesList first equals: 1.
-	self assert: visitor nodesList second equals: 2
-]
-
-{ #category : #tests }
-StTopicBuilderVisitorTest >> testGetNodesListAtInitialization [
-
-	self assert: visitor nodesList isEmpty
-]
-
-{ #category : #tests }
-StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitAllAddInNodesList [
-
-	| file text document |
-	text := '# SectionTest
-This is a paragraphe'.
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: text ].
-	document := (MicroDownParser new parse: file contents).
-	visitor visitAll: document children.
-	self assert: visitor nodesList first isEmpty.
-	self assert: visitor nodesList second size equals: 2 
-
-]
-
-{ #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
 
 	| file text header |
@@ -167,8 +95,8 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
 		stream nextPutAll: text ].
 	header := (MicroDownParser new parse: file contents) children first.
 	visitor visitHeader: header.
-	self assert: visitor rootTopics first title equals: 'SectionTest'.
-	self assert: visitor rootTopics first contents equals: ''
+	self assert: visitor helpTopics subtopics first title equals: 'SectionTest'.
+	self assert: visitor helpTopics subtopics first contents equals: ''
 
 ]
 
@@ -183,36 +111,22 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
 		stream nextPutAll: text ].
 	header := (MicroDownParser new parse: file contents) children first.
 	visitor visitHeader: header.
-	self assert: visitor rootTopics first title equals: 'SectionTest'.
-	self assert: visitor rootTopics first contents equals: ''
+	self assert: visitor helpTopics subtopics first title equals: 'SectionTest'.
+	self assert: visitor helpTopics subtopics first contents equals: ''
 
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 
-	| file topic |
+	| file topics |
 	(file := filesystem workingDirectory / self class spFileName) 
 		writeStreamDo: [ :stream | 
 		stream nextPutAll: self class spFileContentsLevelsSections ].
 	self visitFile: file.
-	topic := visitor rootTopics first.
-	self assert: topic title equals: 'Section 1'.
-	
-	topic := topic subtopics first.
-	self assert: topic title equals: 'Section 2'.
-	
-	topic := topic subtopics first.
-	self assert: topic title equals: 'Section 3'.
-	
-	topic := topic subtopics first.
-	self assert: topic title equals: 'Section 4'.
-	
-	topic := topic subtopics first.
-	self assert: topic title equals: 'Section 5'.
-	
-	topic := topic subtopics first.
-	self assert: topic title equals: 'Section 6'.
+	topics := visitor helpTopics subtopics.
+	self assert: topics first title equals: 'Section 1'.
+	self assert: topics first subtopics first title equals: 'Section 2'.
 ]
 
 { #category : #tests }
@@ -223,8 +137,8 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
 		writeStreamDo: [ :stream | 
 		stream nextPutAll: self class spFileContentsMoreSections ].
 	self visitFile: file.
-	self assert: (visitor rootTopics at: 2) title equals: 'Section 2'.
-	self assert: visitor rootTopics size equals: 2
+	self assert: (visitor helpTopics subtopics second) title equals: 'Section 2'.
+	self assert: visitor helpTopics subtopics size equals: 2
 ]
 
 { #category : #tests }
@@ -236,10 +150,10 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
 			stream nextPutAll: self class spFileContentsWithMoreSubSection ].
 	self visitFile: file.
 	self
-		assert: ((visitor rootTopics at: 1) subtopics at: 2) title
+		assert: (visitor helpTopics subtopics first subtopics second) title
 		equals: 'Section 3'.
-	self assert: visitor rootTopics size equals: 1.
-	self assert: visitor rootTopics first subtopics size equals: 2
+	self assert: visitor helpTopics subtopics size equals: 1.
+	self assert: visitor helpTopics subtopics first subtopics size equals: 2
 ]
 
 { #category : #tests }
@@ -254,8 +168,8 @@ blabla
 		writeStreamDo: [ :stream | 
 		stream nextPutAll: self class spFileContentsOneSection ].
 	self visitFile: file.
-	self assert: (visitor rootTopics at: 1) title equals: 'Section 1'.
-	self assert: visitor rootTopics size equals: 1
+	self assert: (visitor helpTopics subtopics first) title equals: 'Section 1'.
+	self assert: visitor helpTopics subtopics size equals: 1
 ]
 
 { #category : #tests }
@@ -267,14 +181,14 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 			stream nextPutAll: self class spFileContentsWithOneSubSection ].
 	self visitFile: file.
 	self
-		assert: ((visitor rootTopics at: 1) subtopics at: 1) title
+		assert: ((visitor helpTopics subtopics first) subtopics first) title
 		equals: 'Section 2'.
-	self assert: visitor rootTopics size equals: 1.
-	self assert: visitor rootTopics first subtopics size equals: 1
+	self assert: visitor helpTopics subtopics size equals: 1.
+	self assert: visitor helpTopics subtopics first subtopics size equals: 1
 ]
 
 { #category : #helper }
 StTopicBuilderVisitorTest >> visitFile: file [
 
-	visitor start: (MicroDownParser new parse: file contents)
+	visitor visit: (MicroDownParser new parse: file contents)
 ]
