@@ -31,6 +31,17 @@ StTopicBuilderVisitor >> initialize [
 	actualTopic := helpTopics
 ]
 
+{ #category : #internals }
+StTopicBuilderVisitor >> propagateNode: aNode from: aTopic [
+	aTopic owner ifNotNil: [ 
+		aTopic owner addNode: aNode.
+		self propagateNode: aNode from: aTopic owner ]
+	
+	
+	
+	
+]
+
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> visit: anObject [
 	"The normal case is to have
@@ -57,7 +68,8 @@ StTopicBuilderVisitor >> visitAll: aCollection [
 
 	aCollection do: [ :each |
 		each accept: self.
-		actualTopic addNode: each ].
+		actualTopic addNode: each.
+		self propagateNode: each from: actualTopic ].
 	^ helpTopics
 	
 	
