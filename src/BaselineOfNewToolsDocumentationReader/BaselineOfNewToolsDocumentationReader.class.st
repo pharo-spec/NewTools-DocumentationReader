@@ -20,7 +20,7 @@ BaselineOfNewToolsDocumentationReader >> baseline: spec [
 			with: [
 				spec
 					loads: #('RichText');
-					repository: 'github://Pillar-markup/Microdown:dev/src' ].
+					repository: 'github://Pillar-markup/Microdown:master/src' ].
 		
 		spec
 			package: #'NewTools-DocumentationReader'
