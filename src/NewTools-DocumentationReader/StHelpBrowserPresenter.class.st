@@ -170,6 +170,20 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 		  yourself
 ]
 
+{ #category : #'as yet unclassified' }
+StHelpBrowserPresenter class >> search: aTopicName in: topicCollection with: aCollection [
+	topicCollection ifNotEmpty: [ 
+		topicCollection doWithIndex: [ :topic :i |
+		aCollection add: i.
+		topic title = aTopicName
+			ifTrue: [ ^ aCollection ]
+			ifFalse: [ (self search: aTopicName in: topic subtopics with: aCollection) isCollection 
+				ifTrue: [ ^ aCollection]].
+			aCollection removeLast ]
+		 ]
+	
+]
+
 { #category : #initialization }
 StHelpBrowserPresenter >> connectPresenters [
  
@@ -342,6 +356,15 @@ StHelpBrowserPresenter >> rootTopic [
 { #category : #accessing }
 StHelpBrowserPresenter >> rootTopic: aHelpTopic [ 
 	rootTopic := aHelpTopic asHelpTopic
+]
+
+{ #category : #'as yet unclassified' }
+StHelpBrowserPresenter >> searchAndClick: aTopicName [ 
+| collection |
+collection := OrderedCollection new.
+collection add: 1.
+self class search: aTopicName in: rootTopic subtopics  with: collection.
+self topicList clickAtPath: collection
 ]
 
 { #category : #initialization }
