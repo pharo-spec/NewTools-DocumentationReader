@@ -45,12 +45,18 @@ Class {
 
 { #category : #specs }
 StHelpBrowserPresenter class >> defaultSpec [
-
+	| searchInput |
+	searchInput := (SpTextInputFieldPresenter new
+				placeholder: 'Enter you search').
 	 ^ SpBoxLayout newTopToBottom
 			add: (SpPanedLayout newLeftToRight
 				add: #topicList;
 				add: #textOutput;
 				yourself);
+			add: searchInput height: 30 ;
+			add: (SpButtonPresenter new
+				label: 'Search';
+				action: [ lastopenHelp searchAndClick: searchInput text ]) height: 50;
 			yourself
 ]
 
