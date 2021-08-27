@@ -37,7 +37,8 @@ Class {
 	],
 	#classInstVars : [
 		'filesystem',
-		'helpCache'
+		'helpCache',
+		'lastopenHelp'
 	],
 	#category : #'NewTools-DocumentationReader'
 }
@@ -157,14 +158,14 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 	"Implementation note: the logic is not really good because I have to copy the logic from SpPresenter class>>#newApplication:model:.
 	Especially how to pass a model before the initialization which is normally done via message #on: "
 
-	| inst fileReference |
-	inst := self basicNew.
+	| fileReference |
+	lastopenHelp := self basicNew.
 	fileReference := aFileReference exists
 		ifFalse: [  self helpCache ]
 		ifTrue: [ aFileReference ].
-	inst createRootTopicFromFolder: fileReference.
-	^ inst
-		  setModelBeforeInitialization: inst rootTopic;
+	lastopenHelp createRootTopicFromFolder: fileReference.
+	^ lastopenHelp
+		  setModelBeforeInitialization: lastopenHelp rootTopic;
 		  initialize;
 		  openWithSpec;
 		  yourself
