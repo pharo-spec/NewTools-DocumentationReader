@@ -187,6 +187,7 @@ StHelpBrowserPresenter >> connectPresenters [
 StHelpBrowserPresenter >> createRootTopicFromFolder: aFolder [
 	| topic |
 	topic := (self createTopicsFromFileOrFolder: aFolder) first.
+	topic subtopics do: [ :each | self propagateNodeIn: each ].
 	self rootTopic: topic.
 ]
 
@@ -293,6 +294,18 @@ StHelpBrowserPresenter >> morphWriter [
 { #category : #hooks }
 StHelpBrowserPresenter >> parserClass [ 
 	^ MicroDownParser
+]
+
+{ #category : #internals }
+StHelpBrowserPresenter >> propagateNodeIn: aRootTopic [
+
+	aRootTopic node children ifEmpty: [ 
+		aRootTopic subtopics do: [ :each | 
+			self propagateNodeIn: each.
+			each node children do: [ :node |
+				aRootTopic addNode: node ]
+			 ] ]
+	
 ]
 
 { #category : #internals }
