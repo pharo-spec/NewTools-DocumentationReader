@@ -367,11 +367,11 @@ StHelpBrowserPresenter >> rootTopic: aHelpTopic [
 
 { #category : #'as yet unclassified' }
 StHelpBrowserPresenter >> searchAndClick: aTopicName [ 
-| collection |
-collection := OrderedCollection new.
-collection add: 1.
-self class search: aTopicName in: rootTopic subtopics  with: collection.
-self topicList clickAtPath: collection
+	| collection |
+	collection := OrderedCollection new.
+	collection add: 1.
+	self class search: aTopicName in: rootTopic subtopics  with: collection.
+	self topicList clickAtPath: collection
 ]
 
 { #category : #initialization }
