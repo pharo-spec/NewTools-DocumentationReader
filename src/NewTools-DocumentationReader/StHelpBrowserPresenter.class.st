@@ -37,19 +37,26 @@ Class {
 	],
 	#classInstVars : [
 		'filesystem',
-		'helpCache'
+		'helpCache',
+		'lastopenHelp'
 	],
 	#category : #'NewTools-DocumentationReader'
 }
 
 { #category : #specs }
 StHelpBrowserPresenter class >> defaultSpec [
-
+	| searchInput |
+	searchInput := (SpTextInputFieldPresenter new
+				placeholder: 'Enter you search').
 	 ^ SpBoxLayout newTopToBottom
 			add: (SpPanedLayout newLeftToRight
 				add: #topicList;
 				add: #textOutput;
 				yourself);
+			add: searchInput height: 30 ;
+			add: (SpButtonPresenter new
+				label: 'Search';
+				action: [ lastopenHelp searchAndClick: searchInput text ]) height: 50;
 			yourself
 ]
 
@@ -158,17 +165,31 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 	"Implementation note: the logic is not really good because I have to copy the logic from SpPresenter class>>#newApplication:model:.
 	Especially how to pass a model before the initialization which is normally done via message #on: "
 
-	| inst fileReference |
-	inst := self basicNew.
+	| fileReference |
+	lastopenHelp := self basicNew.
 	fileReference := aFileReference exists
 		ifFalse: [  self helpCache ]
 		ifTrue: [ aFileReference ].
-	inst createRootTopicFromFolder: fileReference.
-	^ inst
-		  setModelBeforeInitialization: inst rootTopic;
+	lastopenHelp createRootTopicFromFolder: fileReference.
+	^ lastopenHelp
+		  setModelBeforeInitialization: lastopenHelp rootTopic;
 		  initialize;
 		  openWithSpec;
 		  yourself
+]
+
+{ #category : #'as yet unclassified' }
+StHelpBrowserPresenter class >> search: aTopicName in: topicCollection with: aCollection [
+	topicCollection ifNotEmpty: [ 
+		topicCollection doWithIndex: [ :topic :i |
+		aCollection add: i.
+		topic title = aTopicName
+			ifTrue: [ ^ aCollection ]
+			ifFalse: [ (self search: aTopicName in: topic subtopics with: aCollection) isCollection 
+				ifTrue: [ ^ aCollection]].
+			aCollection removeLast ]
+		 ]
+	
 ]
 
 { #category : #initialization }
@@ -343,6 +364,15 @@ StHelpBrowserPresenter >> rootTopic [
 { #category : #accessing }
 StHelpBrowserPresenter >> rootTopic: aHelpTopic [ 
 	rootTopic := aHelpTopic asHelpTopic
+]
+
+{ #category : #'as yet unclassified' }
+StHelpBrowserPresenter >> searchAndClick: aTopicName [ 
+	| collection |
+	collection := OrderedCollection new.
+	collection add: 1.
+	self class search: aTopicName in: rootTopic subtopics  with: collection.
+	self topicList clickAtPath: collection
 ]
 
 { #category : #initialization }
