@@ -1,10 +1,10 @@
 "
-Execute the following code to open HelpBrowser on doc :
+Execute the following code to open HelpBrowser on doc:
 ```
-StNewHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
+StHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
 ```
 
-Execute the following code to load doc in the cache :
+Execute the following code to load doc in the cache:
 ```
 | doc |
 doc := FileSystem workingDirectory / 'pharo-local' / 'doc'.
@@ -23,7 +23,7 @@ StNewHelpBrowserPresenter emptyHelpCache
 Code to load and use the cache:
 ```
 StHelpBrowserPresenter internalizeHelpFrom: FileSystem disk workingDirectory / 'doc'.
-StNewHelpBrowserPresenter open
+StHelpBrowserPresenter open
 ```
 "
 Class {
@@ -90,12 +90,14 @@ StHelpBrowserPresenter class >> helpCache: aCache [
 { #category : #cache }
 StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 
+	| fileRef |
+	fileRef := aFolderOrFile asFileReference.
 	self filesystem: FileSystem memory.
-	[ self internalizeHelpFrom: aFolderOrFile  at: filesystem workingDirectory basename.
-	self helpCache: self filesystem workingDirectory / aFolderOrFile basename ] 
+	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory basename.
+	self helpCache: self filesystem workingDirectory / fileRef basename ] 
 		on: FileDoesNotExistException 
 		do: [  'We do not do anything special because the only thing we could do is to reinitialize
-			and we may lose the contents there was one.' ]
+and we may lose the contents if there was one.' ]
 ]
 
 { #category : #cache }
@@ -366,7 +368,7 @@ StHelpBrowserPresenter >> rootTopic: aHelpTopic [
 	rootTopic := aHelpTopic asHelpTopic
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #search }
 StHelpBrowserPresenter >> searchAndClick: aTopicName [ 
 	| collection |
 	collection := OrderedCollection new.
