@@ -1,10 +1,10 @@
 "
-Execute the following code to open HelpBrowser on doc :
+Execute the following code to open HelpBrowser on doc:
 ```
-StNewHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
+StHelpBrowserPresenter openOnHelpFolder:  FileSystem workingDirectory / 'doc'.
 ```
 
-Execute the following code to load doc in the cache :
+Execute the following code to load doc in the cache:
 ```
 | doc |
 doc := FileSystem workingDirectory / 'pharo-local' / 'doc'.
@@ -23,7 +23,7 @@ StNewHelpBrowserPresenter emptyHelpCache
 Code to load and use the cache:
 ```
 StHelpBrowserPresenter internalizeHelpFrom: FileSystem disk workingDirectory / 'doc'.
-StNewHelpBrowserPresenter open
+StHelpBrowserPresenter open
 ```
 "
 Class {
@@ -366,7 +366,7 @@ StHelpBrowserPresenter >> rootTopic: aHelpTopic [
 	rootTopic := aHelpTopic asHelpTopic
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #search }
 StHelpBrowserPresenter >> searchAndClick: aTopicName [ 
 	| collection |
 	collection := OrderedCollection new.
