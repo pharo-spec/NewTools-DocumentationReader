@@ -180,12 +180,16 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 		  yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'basic search' }
 StHelpBrowserPresenter class >> search: aTopicName in: topicCollection with: aCollection [
+	
+	| lookedup |
+	lookedup := aTopicName asLowercase.	
+		
 	topicCollection ifNotEmpty: [ 
 		topicCollection doWithIndex: [ :topic :i |
 		aCollection add: i.
-		topic title = aTopicName
+		((topic title asLowercase splitOn: Character space) anySatisfy: [ :each | lookedup match: each ])
 			ifTrue: [ ^ aCollection ]
 			ifFalse: [ (self search: aTopicName in: topic subtopics with: aCollection) isCollection 
 				ifTrue: [ ^ aCollection]].
