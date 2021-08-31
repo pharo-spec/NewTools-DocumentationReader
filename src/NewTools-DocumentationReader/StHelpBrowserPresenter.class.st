@@ -90,12 +90,14 @@ StHelpBrowserPresenter class >> helpCache: aCache [
 { #category : #cache }
 StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 
+	| fileRef |
+	fileRef := aFolderOrFile asFileReference.
 	self filesystem: FileSystem memory.
-	[ self internalizeHelpFrom: aFolderOrFile  at: filesystem workingDirectory basename.
-	self helpCache: self filesystem workingDirectory / aFolderOrFile basename ] 
+	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory basename.
+	self helpCache: self filesystem workingDirectory / fileRef basename ] 
 		on: FileDoesNotExistException 
 		do: [  'We do not do anything special because the only thing we could do is to reinitialize
-			and we may lose the contents there was one.' ]
+and we may lose the contents if there was one.' ]
 ]
 
 { #category : #cache }
