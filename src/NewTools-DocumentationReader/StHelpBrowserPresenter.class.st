@@ -228,7 +228,7 @@ StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
 	visitor := self helpTopicVisitor new.
-	visitor visit: (self parserClass new parseFile: aFileOrFolder).
+	visitor visit: (Microdown new resolvedTreeFromFile: aFileOrFolder).
 	^ visitor helpTopics subtopics
 ]
 
@@ -341,19 +341,6 @@ StHelpBrowserPresenter >> render [
 	| document |
 	document := self parserClass parse: self dummyHelp.
 	textOutput morph setText: (self morphWriter start: document)
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> render: aString [
-
-	| document text |
-	text := aString 
-		ifNil: [ self dummyHelp ]
-		ifNotNil: [ aString ].
-	 document := [ self parserClass parse: text ] 
-							on: MicParsingError
-							do: [ :ex | textOutput morph setText: text. ^ self ].
-	textOutput morph setText: (self morphWriter start: document) 
 ]
 
 { #category : #internals }
