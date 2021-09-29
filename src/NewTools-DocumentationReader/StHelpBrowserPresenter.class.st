@@ -180,6 +180,14 @@ StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 		  yourself
 ]
 
+{ #category : #'instance creation' }
+StHelpBrowserPresenter class >> openPharoRepo [
+	"Open a HelpBrowser on the internalized docs."
+	<example>
+
+	self openOn: (StGithubDocFolderBuilder new buildTopics)
+]
+
 { #category : #'basic search' }
 StHelpBrowserPresenter class >> search: aTopicName in: topicCollection with: aCollection [
 	

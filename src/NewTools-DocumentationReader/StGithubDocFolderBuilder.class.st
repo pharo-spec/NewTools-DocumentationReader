@@ -21,8 +21,8 @@ StGithubDocFolderBuilder >> buildTopic: pathCollection level: level [
 			groupedBy: [ :p | p at: (level+1)]) 
 			values collect: [ :grp | self buildTopic: grp level: level + 1 ].
 	topic := StNodeHelpTopic named: title with: self iconBuilder.
-	topic node children: documents.
-	topic subtopics: subTopics.
+	documents do: [ :doc | topic addNode: doc ].
+	subTopics do: [ :t | topic addSubtopic: t ].
 	^topic
 ]
 
