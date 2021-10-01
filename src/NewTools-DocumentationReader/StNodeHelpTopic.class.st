@@ -9,8 +9,7 @@ Class {
 	#name : #StNodeHelpTopic,
 	#superclass : #HelpTopic,
 	#instVars : [
-		'node',
-		'iconBuilder'
+		'node'
 	],
 	#category : #'NewTools-DocumentationReader'
 }
@@ -33,7 +32,7 @@ StNodeHelpTopic >> addNode: aNode [
 { #category : #adding }
 StNodeHelpTopic >> addSubtopic: aSubTopic [
 
-	iconBuilder buildIcon: self.
+	self iconName: #bookIcon.
 	super addSubtopic: aSubTopic
 ]
 
@@ -45,24 +44,12 @@ StNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
 		ifFalse: [ self addSubtopic: aHelpTopic ]
 ]
 
-{ #category : #accessing }
-StNodeHelpTopic >> iconBuilder [ 
-	^ iconBuilder
-]
-
-{ #category : #accessing }
-StNodeHelpTopic >> iconBuilder: aIconBuilder [
-
-	iconBuilder := aIconBuilder
-]
-
 { #category : #initialize }
 StNodeHelpTopic >> initialize [
 
 	super initialize.
+	self iconName: #pageIcon.
 	node := MicRootBlock new.
-	iconBuilder := StIconBookBuilder new.
-	iconBuilder setIconOf: self
 ]
 
 { #category : #inspecting }
@@ -90,6 +77,6 @@ StNodeHelpTopic >> node [
 { #category : #accessing }
 StNodeHelpTopic >> subtopics: aCollection [
 
-	iconBuilder buildIcon: self.
+	aCollection ifNotEmpty: [self iconName: #bookIcon].
 	super subtopics: aCollection
 ]

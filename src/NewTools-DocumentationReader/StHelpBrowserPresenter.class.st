@@ -219,43 +219,8 @@ StHelpBrowserPresenter >> connectPresenters [
 ]
 
 { #category : #internals }
-StHelpBrowserPresenter >> createRootTopicFromFolder: aFolder [
-	| topic |
-	topic := (self createTopicsFromFileOrFolder: aFolder) first.
-	topic subtopics do: [ :each | self propagateNodeIn: each ].
-	self rootTopic: topic.
-]
-
-{ #category : #internals }
 StHelpBrowserPresenter >> createTopicsFromCache [
 	self createRootTopicFromFolder: self class helpCache.
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
-
-	| visitor |
-	visitor := self helpTopicVisitor new.
-	visitor visit: (Microdown new resolvedTreeFromFile: aFileOrFolder).
-	^ visitor helpTopics subtopics
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
-
-	| subTopic sorted topic |
-	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
-		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
-
-	topic := self helpTopicClass named:
-		         aFileOrFolder basenameWithoutExtension capitalized.
-	sorted := self sortFileAndFolder: aFileOrFolder.
-	sorted do: [ :fileOrFolder | 
-		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
-			topic addSubtopic: each ] ].
-	subTopic := OrderedCollection new.
-	subTopic add: topic.
-	^ subTopic
 ]
 
 { #category : #internals }
@@ -263,19 +228,6 @@ StHelpBrowserPresenter >> dummyHelp [
 
 	^  '# Empty Help
 	This a dummy help.'
-]
-
-{ #category : #hooks }
-StHelpBrowserPresenter >> helpTopicClass [
-
-	^ StNodeHelpTopic
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter >> helpTopicVisitor [
-	
-	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
-	^ helpTopicVisitor
 ]
 
 { #category : #accessing }
@@ -314,12 +266,6 @@ StHelpBrowserPresenter >> initializePresenters [
 
 ]
 
-{ #category : #testing }
-StHelpBrowserPresenter >> isMicFile: aFile [
-
-	^ #( 'mic' 'md' ) includes: aFile extension
-]
-
 { #category : #hooks }
 StHelpBrowserPresenter >> morphWriter [
 
@@ -329,18 +275,6 @@ StHelpBrowserPresenter >> morphWriter [
 { #category : #hooks }
 StHelpBrowserPresenter >> parserClass [ 
 	^ MicroDownParser
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> propagateNodeIn: aRootTopic [
-
-	aRootTopic node children ifEmpty: [ 
-		aRootTopic subtopics do: [ :each | 
-			self propagateNodeIn: each.
-			each node children do: [ :node |
-				aRootTopic addNode: node ]
-			 ] ]
-	
 ]
 
 { #category : #internals }
@@ -357,14 +291,9 @@ StHelpBrowserPresenter >> renderNode: aNode [
 	textOutput morph setText: (self morphWriter visit: aNode)
 ]
 
-{ #category : #accessing }
-StHelpBrowserPresenter >> rootTopic [
-	^ rootTopic ifNil: [ self rootTopic: (self helpTopicClass named: 'Help'). rootTopic ]
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter >> rootTopic: aHelpTopic [ 
-	rootTopic := aHelpTopic asHelpTopic
+{ #category : #initialization }
+StHelpBrowserPresenter >> rootTopic [ 
+	^ rootTopic 
 ]
 
 { #category : #search }
@@ -377,20 +306,8 @@ StHelpBrowserPresenter >> searchAndClick: aTopicName [
 ]
 
 { #category : #initialization }
-StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
-	
-	rootTopic := anHelpTopic
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
-
-	| sorted |
-	sorted := SortedCollection sortBlock: [ :a :b | 
-		          a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | 
-			 e isDirectory or: [ self isMicFile: e ] ]).
-	^ sorted
+StHelpBrowserPresenter >> setModelBeforeInitialization: topic [
+	rootTopic := topic
 ]
 
 { #category : #initialization }

@@ -6,7 +6,6 @@ Class {
 	#name : #StGithubDocFolderBuilder,
 	#superclass : #Object,
 	#instVars : [
-		'iconBuilder',
 		'githubClientConnection',
 		'readingJob',
 		'jobCounter'
@@ -73,12 +72,6 @@ StGithubDocFolderBuilder >> documentForPath: aPath [
 StGithubDocFolderBuilder >> getFiles: pathCollection [
 	"Return an OrderedCollection of documents in the pathCollection"
 	^ pathCollection collect: [ :path | self documentForPath: path ].
-]
-
-{ #category : #accessing }
-StGithubDocFolderBuilder >> iconBuilder [
-	iconBuilder ifNil: [ iconBuilder := StIconBookBuilder new ].
-	^ iconBuilder 
 ]
 
 { #category : #private }
