@@ -4,11 +4,22 @@ A StTopicFromFileFolderBuilderTest is a test class for testing the behavior of S
 Class {
 	#name : #StTopicFromFileFolderBuilderTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'docDir',
+		'rootTopic'
+	],
 	#category : #'NewTools-DocumentationReader-Tests'
 }
 
-{ #category : #'test files' }
-StTopicFromFileFolderBuilderTest class >> contribute_md [
+{ #category : #'as yet unclassified' }
+StTopicFromFileFolderBuilderTest class >> eyeballTest [
+	"This should be able to open the HelpBrowser on the test data"
+	<script>
+	StHelpBrowserPresenter openOnHelpFolder: self new initializeTestFileStore.
+]
+
+{ #category : #initialization }
+StTopicFromFileFolderBuilderTest >> contribute_md [
 	^'# How to Contribute
 
 Yes you can have an impact on Pharo. 
@@ -29,8 +40,8 @@ The following website contains a clear description of the change:
  '
 ]
 
-{ #category : #private }
-StTopicFromFileFolderBuilderTest class >> createFilesIn: root from: anArray [
+{ #category : #initialization }
+StTopicFromFileFolderBuilderTest >> createFilesIn: root from: anArray [
 	"Helper method to create a directory hierarchy with files.
 	Adapted from MemoryFileSystemTest>>createFilesIn:from:"
 
@@ -46,14 +57,14 @@ StTopicFromFileFolderBuilderTest class >> createFilesIn: root from: anArray [
 	^dir
 ]
 
-{ #category : #private }
-StTopicFromFileFolderBuilderTest class >> fileContents: fileName [
-	^ self perform: fileName asSymbol 
+{ #category : #initialization }
+StTopicFromFileFolderBuilderTest >> fileContents: fileName [
+	^ self perform: (fileName copyReplaceAll: '.' with: '_' )asSymbol 
 	
 ]
 
 { #category : #initialization }
-StTopicFromFileFolderBuilderTest class >> initializeTestFileStore [
+StTopicFromFileFolderBuilderTest >> initializeTestFileStore [
 	"I return a file reference to the root of the test file directory"
 	"My structure is:
 	doc
@@ -64,15 +75,22 @@ StTopicFromFileFolderBuilderTest class >> initializeTestFileStore [
 			sunitFramework.md
 	The subject files are made in the methods topic1Subject11 etc
 	"
-	| docDir |
+	docDir ifNotNil: [ ^docDir  ].
 	docDir := self 
 		createFilesIn: FileSystem memory workingDirectory
-		from:  #( doc #(welcome welcome_md contribute_md) #(sunit sunitFramework_md)).
-	^docDir parent
+		from:  #( doc #(welcome 'welcome.md' 'contribute.md') #(sunit 'sunitFramework.md')).
+	^docDir
 ]
 
-{ #category : #'test files' }
-StTopicFromFileFolderBuilderTest class >> sunitFramework_md [
+{ #category : #running }
+StTopicFromFileFolderBuilderTest >> setUp [
+	super setUp.
+	self initializeTestFileStore.
+	rootTopic := StTopicFromFileFolderBuilder new createRootTopicFromFolder: docDir
+]
+
+{ #category : #initialization }
+StTopicFromFileFolderBuilderTest >> sunitFramework_md [
 	^'# SUnit framework
 
 SUnit is the mother of all unit testing frameworks, and serves as one of the cornerstones of test-driven development methodologies such as eXtreme Programming. 
@@ -81,8 +99,51 @@ The culture of testing has always been part of the philosophy of development in 
 You write a method, accept the code and test it by writing a small script in a workspace, in a comment or an example as a class method. But this approach does not allow to automatically repeat the testing or ensure that the code is working. SUnit is a framework you can use to describe and execute unit tests. Unit testing is a method by which individual units of source code are tested to determine if they are fit for use. A unit is the smallest testable part of an application.'
 ]
 
-{ #category : #'test files' }
-StTopicFromFileFolderBuilderTest class >> welcome_md [
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testGetsTopics [
+	"Checking that anything works at all"
+	self assert: rootTopic isNotNil.
+	self assert: rootTopic class equals: StNodeHelpTopic.
+	self assert: rootTopic title equals: 'Doc'
+]
+
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testHeadersExtractedToTopics [
+	"The Welcome file in the test data has a header 'Quick setup' which should be made into a topic"
+	| welcome welcomeTo10 |
+	welcome := rootTopic subtopics detect: [ :topic | topic title = 'Welcome' ].
+	welcomeTo10 := welcome subtopics detect: [ :topic | topic title = 'Welcome to Pharo 10' ].
+	self assert: welcomeTo10 subtopics first title equals: 'Quick setup'
+]
+
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testNodesGetLifted [
+	"The document contents of files should be aggregated into a combined document for directories"
+	rootTopic subtopics do: [ :dirLevelTopic |
+		self assert: dirLevelTopic node children isNotEmpty ]
+]
+
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testOpenOnDoesNotExistFolder [
+
+	self 
+		should: [ StTopicFromFileFolderBuilder new createRootTopicFromFolder: 'nowhere' asFileReference  ]
+		raise: DirectoryDoesNotExist 
+]
+
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testRootTopicHasNoContents [
+	self assert: rootTopic contents children isEmpty
+]
+
+{ #category : #tests }
+StTopicFromFileFolderBuilderTest >> testSubtopics [
+	self assert: rootTopic subtopics size equals: 2.
+	self assert: (rootTopic subtopics collect: #title) asSet equals: #(Welcome Sunit) asSet
+]
+
+{ #category : #initialization }
+StTopicFromFileFolderBuilderTest >> welcome_md [
 	^'# Welcome to Pharo 10
 
 Welcome to Pharo, an immersive live programming environment.

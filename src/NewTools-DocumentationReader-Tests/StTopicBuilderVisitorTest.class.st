@@ -1,10 +1,6 @@
 Class {
 	#name : #StTopicBuilderVisitorTest,
 	#superclass : #TestCase,
-	#instVars : [
-		'filesystem',
-		'visitor'
-	],
 	#category : #'NewTools-DocumentationReader-Tests'
 }
 
@@ -71,124 +67,84 @@ StTopicBuilderVisitorTest class >> spFileName [
 ]
 
 { #category : #tests }
-StTopicBuilderVisitorTest >> helpTopicClass [
-
-	^ StNodeHelpTopic
-]
-
-{ #category : #running }
-StTopicBuilderVisitorTest >> setUp [
-	super setUp.
-	filesystem := FileSystem memory.
-	visitor := StTopicBuilderVisitor new
-	
-]
-
-{ #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeader [
 
-	| file text header |
+	| text topic |
 	text := '# SectionTest
 	This is a paragraphe'.
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: text ].
-	header := (MicroDownParser new parse: file contents) children first.
-	visitor visitHeader: header.
-	self assert: visitor helpTopics subtopics first title equals: 'SectionTest'.
-	self assert: visitor helpTopics subtopics first contents equals: ''
+	topic := self topicIn: text.
+	self assert: topic subtopics first title equals: 'SectionTest'.
+	self assert: topic subtopics first subtopics isEmpty 
 
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
 
-	| file text header |
+	| text topic |
 	text := '## SectionTest
 	This is a paragraphe'.
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: text ].
-	header := (MicroDownParser new parse: file contents) children first.
-	visitor visitHeader: header.
-	self assert: visitor helpTopics subtopics first title equals: 'SectionTest'.
-	self assert: visitor helpTopics subtopics first contents equals: ''
+	topic := self topicIn: text.
+	self assert: topic subtopics first title equals: 'SectionTest'.
+	self assert: topic subtopics first subtopics isEmpty 
 
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 
-	| file topics |
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: self class spFileContentsLevelsSections ].
-	self visitFile: file.
-	topics := visitor helpTopics subtopics.
-	self assert: topics first title equals: 'Section 1'.
-	self assert: topics first subtopics first title equals: 'Section 2'.
+	|  topic |
+	
+	topic := self topicIn: self class spFileContentsLevelsSections.
+	self assert: topic subtopics first title equals: 'Section 1'.
+	self assert: topic subtopics first subtopics first title equals: 'Section 2'.
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
-
-	| file |
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: self class spFileContentsMoreSections ].
-	self visitFile: file.
-	self assert: (visitor helpTopics subtopics second) title equals: 'Section 2'.
-	self assert: visitor helpTopics subtopics size equals: 2
+	| topic |
+	topic := self topicIn: self class spFileContentsMoreSections.
+	self assert: topic subtopics second title equals: 'Section 2'.
+	self assert: topic subtopics size equals: 2
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
-
-	| file |
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-			stream nextPutAll: self class spFileContentsWithMoreSubSection ].
-	self visitFile: file.
+	| topic |
+	
+	topic := self topicIn: self class spFileContentsWithMoreSubSection.
 	self
-		assert: (visitor helpTopics subtopics first subtopics second) title
+		assert: (topic subtopics first subtopics second) title
 		equals: 'Section 3'.
-	self assert: visitor helpTopics subtopics size equals: 1.
-	self assert: visitor helpTopics subtopics first subtopics size equals: 2
+	self assert: topic subtopics size equals: 1.
+	self assert: topic subtopics first subtopics size equals: 2
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSection [
-
-	| file text |
-	text := '
-blabla
-blabla
-'.
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-		stream nextPutAll: self class spFileContentsOneSection ].
-	self visitFile: file.
-	self assert: (visitor helpTopics subtopics first) title equals: 'Section 1'.
-	self assert: visitor helpTopics subtopics size equals: 1
+	
+	| topic |
+	topic := self topicIn: self class spFileContentsOneSection.
+	self assert: topic subtopics first title equals: 'Section 1'.
+	self assert: topic subtopics size equals: 1
 ]
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 
-	| file |
-	(file := filesystem workingDirectory / self class spFileName) 
-		writeStreamDo: [ :stream | 
-			stream nextPutAll: self class spFileContentsWithOneSubSection ].
-	self visitFile: file.
+	| topic |
+	topic := self topicIn: self class spFileContentsWithOneSubSection.
 	self
-		assert: ((visitor helpTopics subtopics first) subtopics first) title
+		assert: topic subtopics first subtopics first title
 		equals: 'Section 2'.
-	self assert: visitor helpTopics subtopics size equals: 1.
-	self assert: visitor helpTopics subtopics first subtopics size equals: 1
+	self assert: topic subtopics size equals: 1.
+	self assert: topic subtopics first subtopics size equals: 1
 ]
 
 { #category : #helper }
-StTopicBuilderVisitorTest >> visitFile: file [
-
-	visitor visit: (MicroDownParser new parse: file contents)
+StTopicBuilderVisitorTest >> topicIn: aString [
+	| visitor |
+	visitor := StTopicBuilderVisitor new.
+	visitor visit: (MicroDownParser new parse: aString).
+	^ visitor helpTopic 
 ]
