@@ -17,28 +17,12 @@ Class {
 StTopicFromGithubBuilderTest class >> eyeballTest [
 	"This should be able to open the HelpBrowser on the test data (actual data from github)"
 	<script>
-	StHelpBrowserPresenter openOn: self root.
-]
-
-{ #category : #accessing }
-StTopicFromGithubBuilderTest class >> initGithubRoot [
-	root := StTopicFromGithubBuilder new buildTopics
-]
-
-{ #category : #accessing }
-StTopicFromGithubBuilderTest class >> reset [
-	root := nil.
-]
-
-{ #category : #accessing }
-StTopicFromGithubBuilderTest class >> root [
-	root ifNil: [ self initGithubRoot  ].
-	^root
+	StHelpBrowserPresenter openTopic: self new root.
 ]
 
 { #category : #accessing }
 StTopicFromGithubBuilderTest >> root [
-	^ self class root
+	^ StTopicFromGithubBuilder githubTopics
 ]
 
 { #category : #tests }

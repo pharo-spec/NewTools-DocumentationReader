@@ -11,10 +11,30 @@ Class {
 		'rootTopic',
 		'helpTopicVisitor'
 	],
+	#classInstVars : [
+		'cache'
+	],
 	#category : #'NewTools-DocumentationReader'
 }
 
-{ #category : #internals }
+{ #category : #accessing }
+StTopicFromFileFolderBuilder class >> cache [
+	cache ifNil: [ cache := Dictionary new ].
+	^ cache
+]
+
+{ #category : #'as yet unclassified' }
+StTopicFromFileFolderBuilder class >> onDirectory: fileReference [
+	"return a topic from fileRefence (assumed to be a folder)"
+	^ self cache at: fileReference ifAbsentPut: [ self new createRootTopicFromFolder: fileReference]
+]
+
+{ #category : #accessing }
+StTopicFromFileFolderBuilder class >> resetCache [
+	cache := nil
+]
+
+{ #category : #'public api' }
 StTopicFromFileFolderBuilder >> createRootTopicFromFolder: aFolder [
 	"I am the entry method"
 	| topic |

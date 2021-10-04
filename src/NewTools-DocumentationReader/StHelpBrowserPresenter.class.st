@@ -36,7 +36,6 @@ Class {
 		'helpTopicVisitor'
 	],
 	#classInstVars : [
-		'helpCache',
 		'lastopenHelp'
 	],
 	#category : #'NewTools-DocumentationReader'
@@ -59,34 +58,18 @@ StHelpBrowserPresenter class >> defaultSpec [
 			yourself
 ]
 
-{ #category : #accessing }
-StHelpBrowserPresenter class >> emptyHelpCache [
-
-	helpCache := nil
-]
-
 { #category : #'instance creation' }
 StHelpBrowserPresenter class >> open [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	^ self error: 'We need to define a good starting point' 
-]
-
-{ #category : #'instance creation' }
-StHelpBrowserPresenter class >> openOn: aHelpTopic [
-	"Open the receiver on the given help topic or any other object that can be transformed into
-	 a help topic by sending #asHelpTopic."
-
-	^ (self on:  aHelpTopic)
-		openWithSpec;
-		yourself
+	^ self error: 'We need to define a default starting point' 
 ]
 
 { #category : #'instance creation' }
 StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 	[ aDescription bookName.
-	 ^ self openOn: (CustomHelpHelpBuilder new createTopicFrom: aDescription)] 
+	 ^ self openTopic: (CustomHelpHelpBuilder new createTopicFrom: aDescription)] 
 	on: MessageNotUnderstood do: [ | inst |
 		inst:= self basicNew.
 		inst createTopicsFromCache.
@@ -103,7 +86,7 @@ StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
 	"Open an help browser on a given folder."
 
-	self openOn: (StTopicFromFileFolderBuilder new createRootTopicFromFolder: aFileReference )
+	self openTopic: (StTopicFromFileFolderBuilder onDirectory: aFileReference )
 ]
 
 { #category : #'instance creation' }
@@ -111,7 +94,17 @@ StHelpBrowserPresenter class >> openPharoRepo [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	self openOn: (StTopicFromGithubBuilder new buildTopics)
+	self openTopic: (StTopicFromGithubBuilder githubTopics)
+]
+
+{ #category : #'instance creation' }
+StHelpBrowserPresenter class >> openTopic: aHelpTopic [
+	"Open the receiver on the given help topic or any other object that can be transformed into
+	 a help topic by sending #asHelpTopic."
+
+	^ (self on:  aHelpTopic)
+		openWithSpec;
+		yourself
 ]
 
 { #category : #'basic search' }

@@ -21,8 +21,29 @@ Class {
 		'readingJob',
 		'jobCounter'
 	],
+	#classInstVars : [
+		'githubTopics'
+	],
 	#category : #'NewTools-DocumentationReader'
 }
+
+{ #category : #accessing }
+StTopicFromGithubBuilder class >> githubTopics [
+	githubTopics ifNil: [ githubTopics := self new buildTopics].
+	^githubTopics
+]
+
+{ #category : #accessing }
+StTopicFromGithubBuilder class >> openBrowser [
+	<script>
+	StHelpBrowserPresenter openTopic: self githubTopics 
+]
+
+{ #category : #accessing }
+StTopicFromGithubBuilder class >> reset [
+	<script>
+	githubTopics := nil.
+]
 
 { #category : #private }
 StTopicFromGithubBuilder >> buildSubtopics: pathCollection level: level [

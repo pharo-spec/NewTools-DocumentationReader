@@ -100,6 +100,20 @@ You write a method, accept the code and test it by writing a small script in a w
 ]
 
 { #category : #tests }
+StTopicFromFileFolderBuilderTest >> testCaching [
+	"test that the presumed caching speeds things up"
+	| raw cached first second |
+	StTopicFromFileFolderBuilder resetCache.
+	raw := Time microsecondsToRun: 
+		[ first := StTopicFromFileFolderBuilder onDirectory: docDir ].
+	cached := Time microsecondsToRun: 
+		[ second := StTopicFromFileFolderBuilder onDirectory: docDir ].
+	self assert: raw > cached.
+	self assert: second equals: first.
+	
+]
+
+{ #category : #tests }
 StTopicFromFileFolderBuilderTest >> testGetsTopics [
 	"Checking that anything works at all"
 	self assert: rootTopic isNotNil.
