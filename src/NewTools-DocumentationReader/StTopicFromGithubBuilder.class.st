@@ -4,7 +4,7 @@ From these files I create a topic hiearachy.
 "
 Class {
 	#name : #StTopicFromGithubBuilder,
-	#superclass : #Object,
+	#superclass : #StTopicMicrodownBuilder,
 	#instVars : [
 		'githubClientConnection',
 		'readingJob',

@@ -6,7 +6,7 @@ It will have subtropics based on subfoldes and the heading hiearchy of the markd
 "
 Class {
 	#name : #StTopicFromFileFolderBuilder,
-	#superclass : #Object,
+	#superclass : #StTopicMicrodownBuilder,
 	#instVars : [
 		'rootTopic',
 		'helpTopicVisitor'
@@ -19,24 +19,20 @@ StTopicFromFileFolderBuilder >> createRootTopicFromFolder: aFolder [
 	"I am the entry method"
 	| topic |
 	topic := (self createTopicsFromFileOrFolder: aFolder) first.
-	topic subtopics do: [ :each | self propagateNodeIn: each ].
+	topic subtopics do: [ :each | self liftNodesIn: each ].
 	self rootTopic: topic.
 	^ topic 
 ]
 
 { #category : #internals }
 StTopicFromFileFolderBuilder >> createTopicsFromFile: aFileOrFolder [
-
-	| visitor |
-	visitor := self helpTopicVisitor new.
-	visitor visit: (Microdown new resolvedTreeFromFile: aFileOrFolder).
-	^ visitor helpTopics subtopics
+	^ self createTopicsFromDocument:  (Microdown new resolvedTreeFromFile: aFileOrFolder).
 ]
 
 { #category : #internals }
 StTopicFromFileFolderBuilder >> createTopicsFromFileOrFolder: aFileOrFolder [
 
-	| subTopic sorted topic |
+	| sorted topic |
 	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
 		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
 
@@ -45,9 +41,7 @@ StTopicFromFileFolderBuilder >> createTopicsFromFileOrFolder: aFileOrFolder [
 	sorted do: [ :fileOrFolder | 
 		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
 			topic addSubtopic: each ] ].
-	subTopic := OrderedCollection new.
-	subTopic add: topic.
-	^ subTopic
+	^ OrderedCollection with: topic.
 ]
 
 { #category : #hooks }
@@ -56,29 +50,10 @@ StTopicFromFileFolderBuilder >> helpTopicClass [
 	^ StNodeHelpTopic
 ]
 
-{ #category : #accessing }
-StTopicFromFileFolderBuilder >> helpTopicVisitor [
-	
-	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
-	^ helpTopicVisitor
-]
-
 { #category : #testing }
 StTopicFromFileFolderBuilder >> isMicFile: aFile [
 
 	^ #( 'mic' 'md' ) includes: aFile extension
-]
-
-{ #category : #internals }
-StTopicFromFileFolderBuilder >> propagateNodeIn: aRootTopic [
-	"If root node (microdown document) is empty, lift nodes from subtopics into node of root"
-	aRootTopic node children ifEmpty: [ 
-		aRootTopic subtopics do: [ :each | 
-			self propagateNodeIn: each.
-			each node children do: [ :node |
-				aRootTopic addNode: node ]
-			 ] ]
-	
 ]
 
 { #category : #accessing }

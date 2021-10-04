@@ -6,11 +6,28 @@ Class {
 	#name : #StTopicBuilderVisitor,
 	#superclass : #MicrodownVisitor,
 	#instVars : [
-		'helpTopics',
-		'actualTopic'
+		'actualTopic',
+		'helpTopicVisitor',
+		'helpTopic'
 	],
 	#category : #'NewTools-DocumentationReader'
 }
+
+{ #category : #internals }
+StTopicBuilderVisitor >> extractNode: aNode into: aTopic [
+	aTopic owner ifNotNil: [ 
+		aTopic owner addNode: aNode.
+		self extractNode: aNode into: aTopic owner ]
+	
+	
+	
+	
+]
+
+{ #category : #accessing }
+StTopicBuilderVisitor >> helpTopic [
+	^ helpTopic
+]
 
 { #category : #'visiting-document' }
 StTopicBuilderVisitor >> helpTopicClass [
@@ -19,27 +36,18 @@ StTopicBuilderVisitor >> helpTopicClass [
 ]
 
 { #category : #accessing }
-StTopicBuilderVisitor >> helpTopics [
-	^ helpTopics
+StTopicBuilderVisitor >> helpTopicVisitor [
+	
+	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
+	^ helpTopicVisitor
 ]
 
 { #category : #initialization }
 StTopicBuilderVisitor >> initialize [ 
 	
 	super initialize.
-	helpTopics := StNodeHelpTopic new.
-	actualTopic := helpTopics
-]
-
-{ #category : #internals }
-StTopicBuilderVisitor >> propagateNode: aNode from: aTopic [
-	aTopic owner ifNotNil: [ 
-		aTopic owner addNode: aNode.
-		self propagateNode: aNode from: aTopic owner ]
-	
-	
-	
-	
+	helpTopic := StNodeHelpTopic new.
+	actualTopic := helpTopic
 ]
 
 { #category : #'visiting-document' }
@@ -69,8 +77,8 @@ StTopicBuilderVisitor >> visitAll: aCollection [
 	aCollection do: [ :each |
 		each accept: self.
 		actualTopic addNode: each.
-		self propagateNode: each from: actualTopic ].
-	^ helpTopics
+		self extractNode: each into: actualTopic ].
+	^ helpTopic
 	
 	
 ]
@@ -82,5 +90,5 @@ StTopicBuilderVisitor >> visitHeader: aHeader [
 		| topic |
 		topic := self helpTopicClass named: aHeader header capitalized.
 		actualTopic := topic.
-		helpTopics addSubtopic: topic with: aHeader level ]
+		helpTopic addSubtopic: topic with: aHeader level ]
 ]
