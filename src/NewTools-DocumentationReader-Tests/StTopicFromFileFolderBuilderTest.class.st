@@ -118,7 +118,7 @@ StTopicFromFileFolderBuilderTest >> testHeadersExtractedToTopics [
 
 { #category : #tests }
 StTopicFromFileFolderBuilderTest >> testNodesGetLifted [
-	"The document contents of files should be aggregated into a combined document for directories"
+	"The document contents of files should be aggregated into a combined document for folders"
 	rootTopic subtopics do: [ :dirLevelTopic |
 		self assert: dirLevelTopic node children isNotEmpty ]
 ]
