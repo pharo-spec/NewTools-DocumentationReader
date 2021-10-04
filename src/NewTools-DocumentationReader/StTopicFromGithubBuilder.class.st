@@ -1,6 +1,17 @@
 "
 I am read the microdown files in the pharo-project/pharo/doc folder. 
 From these files I create a topic hiearachy.
+
+My implementation is suffering from the structure of the github api, which do not return a folder tree, but a list of folders. 
+In the key method `buildSubtopics: pathCollection level: level` the pathCollection and level is a approximation of a folder. Level 3 and path collection:
+
+```
+	aaa/bbb/ccc/ddd/eee
+	aaa/bbb/ccc/fff
+	aaa/bbb/ccc/hhh/ggg
+```
+
+would represent the folder: 'aaa/bbb/ccc' (first 3) with subfolders/files: {ddd/eee. fff. hhh/ggg}
 "
 Class {
 	#name : #StTopicFromGithubBuilder,
@@ -26,20 +37,21 @@ StTopicFromGithubBuilder >> buildSubtopics: pathCollection level: level [
 { #category : #private }
 StTopicFromGithubBuilder >> buildTopic: pathCollection level: level [
 	"I assume collectionOfPaths to share a root"
-	| documents subTopics  title topic |
+	| docTopics subTopics topic |
 	
-	title := pathCollection first at: level.
-	documents := self getFiles: (pathCollection select: [ :p | p size = level ]).
-	subTopics := self buildSubtopics: pathCollection level: level + 1.
-	topic := StNodeHelpTopic named: title.
-	documents do: [ :doc | topic addNode: doc ].
-	subTopics do: [ :t | topic addSubtopic: t; addNode: t node ].
+	docTopics := self getFiles: (pathCollection select: [ :p | p size = level ]).
+	subTopics := docTopics , (self buildSubtopics: pathCollection level: level + 1).
+	subTopics size = 1 
+		ifTrue: [ ^ subTopics first ].
+	topic := StNodeHelpTopic named: subTopics first title.
+	(docTopics, subTopics) do: [ :t | topic addSubtopic: t"; addNode: t node" ].
+	self liftNodesIn: topic.
 	^topic
 ]
 
 { #category : #'public-api' }
 StTopicFromGithubBuilder >> buildTopics [
-	"I return a topic tree read from the pharo-project repository on github"
+	"I return a topic (with subtopics) read from the pharo-project repository on github"
 	| root subTopics|
 	[ :job |
 		readingJob := job.
@@ -58,7 +70,7 @@ StTopicFromGithubBuilder >> buildTopics [
 StTopicFromGithubBuilder >> documentForPath: aPath [
 	"https://raw.githubusercontent.com/pharo-project/pharo/Pharo10/doc/Epicea/1-Epicea.md"
 	"aPath is the stuff after the doc/"
-	|url response doc|
+	|url response doc |
 	readingJob title: aPath segments last.
 	url := 'https://raw.githubusercontent.com/pharo-project/pharo/'
 		,self pharoVersion,'/doc/', aPath pathString.
@@ -66,16 +78,16 @@ StTopicFromGithubBuilder >> documentForPath: aPath [
 	doc := MicroDownParser parse: response. 
 	readingJob progress: (jobCounter / 10).
 	jobCounter := (jobCounter % 10) + 1.
-	^doc
+	^ self createTopicsFromDocument: doc
 ]
 
 { #category : #private }
 StTopicFromGithubBuilder >> getFiles: pathCollection [
 	"Return an OrderedCollection of documents in the pathCollection"
-	^ pathCollection collect: [ :path | self documentForPath: path ].
+	^ (pathCollection collect: [ :path | self documentForPath: path ]) flattened.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 StTopicFromGithubBuilder >> locationFrom: pathCollection level: level [
 	^ (pathCollection first segments copyFrom: 1 to: level) joinUsing: '/'
 ]
