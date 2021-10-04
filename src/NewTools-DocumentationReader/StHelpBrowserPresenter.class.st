@@ -36,7 +36,6 @@ Class {
 		'helpTopicVisitor'
 	],
 	#classInstVars : [
-		'filesystem',
 		'helpCache',
 		'lastopenHelp'
 	],
@@ -66,62 +65,12 @@ StHelpBrowserPresenter class >> emptyHelpCache [
 	helpCache := nil
 ]
 
-{ #category : #accessing }
-StHelpBrowserPresenter class >> filesystem [
-	^ filesystem
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> filesystem: aFileSystem [
-	filesystem := aFileSystem
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> helpCache [
-
-	^ helpCache ifNil: [ helpCache := FileSystem memory workingDirectory ]
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> helpCache: aCache [
-	helpCache := aCache
-]
-
-{ #category : #cache }
-StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
-
-	| fileRef |
-	fileRef := aFolderOrFile asFileReference.
-	self filesystem: FileSystem memory.
-	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory basename.
-	self helpCache: self filesystem workingDirectory / fileRef basename ] 
-		on: FileDoesNotExistException 
-		do: [  'We do not do anything special because the only thing we could do is to reinitialize
-and we may lose the contents if there was one.' ]
-]
-
-{ #category : #cache }
-StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderName [
-
-	aFolderOrFile isDirectory 
-		ifTrue:  [ | directoryPath |
-					directoryPath := aFolderName , '/' , aFolderOrFile basename.
-					self filesystem createDirectory: directoryPath.
-					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
-		ifFalse: [ | file filePath |
-					(self new isMicFile: aFolderOrFile) 
-						ifTrue: [ 
-							filePath := aFolderName , '/' , aFolderOrFile basename.
-							file := self filesystem workingDirectory / filePath.
-							file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ] ]
-]
-
 { #category : #'instance creation' }
 StHelpBrowserPresenter class >> open [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	^ self openOnHelpFolder: self helpCache 
+	^ self error: 'We need to define a good starting point' 
 ]
 
 { #category : #'instance creation' }
@@ -151,33 +100,10 @@ StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 ]
 
 { #category : #'instance creation' }
-StHelpBrowserPresenter class >> openOnHelpFolder [
-	"Open an help browser."
-	
-	self openOnHelpFolder: FileSystem workingDirectory / 'pharo-local' / 'doc'
-
-	
-]
-
-{ #category : #'instance creation' }
 StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
-
 	"Open an help browser on a given folder."
 
-	"Implementation note: the logic is not really good because I have to copy the logic from SpPresenter class>>#newApplication:model:.
-	Especially how to pass a model before the initialization which is normally done via message #on: "
-
-	| fileReference |
-	lastopenHelp := self basicNew.
-	fileReference := aFileReference exists
-		ifFalse: [  self helpCache ]
-		ifTrue: [ aFileReference ].
-	lastopenHelp createRootTopicFromFolder: fileReference.
-	^ lastopenHelp
-		  setModelBeforeInitialization: lastopenHelp rootTopic;
-		  initialize;
-		  openWithSpec;
-		  yourself
+	self openOn: (StTopicFromFileFolderBuilder new createRootTopicFromFolder: aFileReference )
 ]
 
 { #category : #'instance creation' }
@@ -185,7 +111,7 @@ StHelpBrowserPresenter class >> openPharoRepo [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	self openOn: (StGithubDocFolderBuilder new buildTopics)
+	self openOn: (StTopicFromGithubBuilder new buildTopics)
 ]
 
 { #category : #'basic search' }

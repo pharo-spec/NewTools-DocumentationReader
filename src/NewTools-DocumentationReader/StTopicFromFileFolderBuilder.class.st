@@ -5,7 +5,7 @@ The topic tree will have one root - based on the root folder.
 It will have subtropics based on subfoldes and the heading hiearchy of the markdown files in the folders.
 "
 Class {
-	#name : #StFileFolderBuilder,
+	#name : #StTopicFromFileFolderBuilder,
 	#superclass : #Object,
 	#instVars : [
 		'rootTopic',
@@ -15,15 +15,17 @@ Class {
 }
 
 { #category : #internals }
-StFileFolderBuilder >> createRootTopicFromFolder: aFolder [
+StTopicFromFileFolderBuilder >> createRootTopicFromFolder: aFolder [
+	"I am the entry method"
 	| topic |
 	topic := (self createTopicsFromFileOrFolder: aFolder) first.
 	topic subtopics do: [ :each | self propagateNodeIn: each ].
 	self rootTopic: topic.
+	^ topic 
 ]
 
 { #category : #internals }
-StFileFolderBuilder >> createTopicsFromFile: aFileOrFolder [
+StTopicFromFileFolderBuilder >> createTopicsFromFile: aFileOrFolder [
 
 	| visitor |
 	visitor := self helpTopicVisitor new.
@@ -32,14 +34,13 @@ StFileFolderBuilder >> createTopicsFromFile: aFileOrFolder [
 ]
 
 { #category : #internals }
-StFileFolderBuilder >> createTopicsFromFileOrFolder: aFileOrFolder [
+StTopicFromFileFolderBuilder >> createTopicsFromFileOrFolder: aFileOrFolder [
 
 	| subTopic sorted topic |
 	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
 		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
 
-	topic := self helpTopicClass named:
-		         aFileOrFolder basenameWithoutExtension capitalized.
+	topic := self helpTopicClass named: aFileOrFolder basenameWithoutExtension capitalized.
 	sorted := self sortFileAndFolder: aFileOrFolder.
 	sorted do: [ :fileOrFolder | 
 		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
@@ -50,26 +51,26 @@ StFileFolderBuilder >> createTopicsFromFileOrFolder: aFileOrFolder [
 ]
 
 { #category : #hooks }
-StFileFolderBuilder >> helpTopicClass [
+StTopicFromFileFolderBuilder >> helpTopicClass [
 
 	^ StNodeHelpTopic
 ]
 
 { #category : #accessing }
-StFileFolderBuilder >> helpTopicVisitor [
+StTopicFromFileFolderBuilder >> helpTopicVisitor [
 	
 	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
 	^ helpTopicVisitor
 ]
 
 { #category : #testing }
-StFileFolderBuilder >> isMicFile: aFile [
+StTopicFromFileFolderBuilder >> isMicFile: aFile [
 
 	^ #( 'mic' 'md' ) includes: aFile extension
 ]
 
 { #category : #internals }
-StFileFolderBuilder >> propagateNodeIn: aRootTopic [
+StTopicFromFileFolderBuilder >> propagateNodeIn: aRootTopic [
 	"If root node (microdown document) is empty, lift nodes from subtopics into node of root"
 	aRootTopic node children ifEmpty: [ 
 		aRootTopic subtopics do: [ :each | 
@@ -81,17 +82,17 @@ StFileFolderBuilder >> propagateNodeIn: aRootTopic [
 ]
 
 { #category : #accessing }
-StFileFolderBuilder >> rootTopic [
+StTopicFromFileFolderBuilder >> rootTopic [
 	^ rootTopic ifNil: [ self rootTopic: (self helpTopicClass named: 'Help'). rootTopic ]
 ]
 
 { #category : #accessing }
-StFileFolderBuilder >> rootTopic: aHelpTopic [ 
+StTopicFromFileFolderBuilder >> rootTopic: aHelpTopic [ 
 	rootTopic := aHelpTopic asHelpTopic
 ]
 
 { #category : #internals }
-StFileFolderBuilder >> sortFileAndFolder: aFileOrFolder [
+StTopicFromFileFolderBuilder >> sortFileAndFolder: aFileOrFolder [
 
 	| sorted |
 	sorted := SortedCollection sortBlock: [ :a :b | 

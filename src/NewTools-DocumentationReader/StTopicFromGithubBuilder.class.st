@@ -3,7 +3,7 @@ I am read the microdown files in the pharo-project/pharo/doc folder.
 From these files I create a topic hiearachy.
 "
 Class {
-	#name : #StGithubDocFolderBuilder,
+	#name : #StTopicFromGithubBuilder,
 	#superclass : #Object,
 	#instVars : [
 		'githubClientConnection',
@@ -14,7 +14,7 @@ Class {
 }
 
 { #category : #private }
-StGithubDocFolderBuilder >> buildSubtopics: pathCollection level: level [
+StTopicFromGithubBuilder >> buildSubtopics: pathCollection level: level [
 	"I assume pachCollection shares path below level"
 	| subDirectories subTopics |
 	subDirectories := pathCollection select: [ :p | p size >= level ].
@@ -24,27 +24,28 @@ StGithubDocFolderBuilder >> buildSubtopics: pathCollection level: level [
 ]
 
 { #category : #private }
-StGithubDocFolderBuilder >> buildTopic: pathCollection level: level [
+StTopicFromGithubBuilder >> buildTopic: pathCollection level: level [
 	"I assume collectionOfPaths to share a root"
 	| documents subTopics  title topic |
+	
 	title := pathCollection first at: level.
 	documents := self getFiles: (pathCollection select: [ :p | p size = level ]).
 	subTopics := self buildSubtopics: pathCollection level: level + 1.
-	topic := StNodeHelpTopic named: title with: self iconBuilder.
+	topic := StNodeHelpTopic named: title.
 	documents do: [ :doc | topic addNode: doc ].
 	subTopics do: [ :t | topic addSubtopic: t; addNode: t node ].
 	^topic
 ]
 
 { #category : #'public-api' }
-StGithubDocFolderBuilder >> buildTopics [
+StTopicFromGithubBuilder >> buildTopics [
 	"I return a topic tree read from the pharo-project repository on github"
 	| root subTopics|
 	[ :job |
 		readingJob := job.
 		jobCounter := 1.
 		githubClientConnection := ZnClient new.
-		root := StNodeHelpTopic named: 'Pharo Help' with: self iconBuilder.
+		root := StNodeHelpTopic named: 'Pharo Help'.
 		subTopics := self buildSubtopics: self pharoDocPaths level: 1.
 		subTopics do: [ :t | root addSubtopic: t ].
 		githubClientConnection close.
@@ -54,7 +55,7 @@ StGithubDocFolderBuilder >> buildTopics [
 ]
 
 { #category : #private }
-StGithubDocFolderBuilder >> documentForPath: aPath [
+StTopicFromGithubBuilder >> documentForPath: aPath [
 	"https://raw.githubusercontent.com/pharo-project/pharo/Pharo10/doc/Epicea/1-Epicea.md"
 	"aPath is the stuff after the doc/"
 	|url response doc|
@@ -69,13 +70,18 @@ StGithubDocFolderBuilder >> documentForPath: aPath [
 ]
 
 { #category : #private }
-StGithubDocFolderBuilder >> getFiles: pathCollection [
+StTopicFromGithubBuilder >> getFiles: pathCollection [
 	"Return an OrderedCollection of documents in the pathCollection"
 	^ pathCollection collect: [ :path | self documentForPath: path ].
 ]
 
+{ #category : #'as yet unclassified' }
+StTopicFromGithubBuilder >> locationFrom: pathCollection level: level [
+	^ (pathCollection first segments copyFrom: 1 to: level) joinUsing: '/'
+]
+
 { #category : #private }
-StGithubDocFolderBuilder >> pharoDocPaths [
+StTopicFromGithubBuilder >> pharoDocPaths [
 	"I return an ordered collection of paths for documents in the doc tree"
 	|pharoURL docURL json|
 	"get the files in the pharo-project repository"
@@ -92,6 +98,6 @@ StGithubDocFolderBuilder >> pharoDocPaths [
 ]
 
 { #category : #accessing }
-StGithubDocFolderBuilder >> pharoVersion [
+StTopicFromGithubBuilder >> pharoVersion [
 	^'Pharo10'
 ]

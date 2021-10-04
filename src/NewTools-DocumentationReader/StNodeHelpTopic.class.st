@@ -4,6 +4,8 @@ This is in this document that further microdown elements will be added.
 
 Note that I can have subtopics in addition to the microdown element. 
 A subtopic is just similar to myself.
+
+I store the location I was retrieved from. This location is used for caching of help topics
 "
 Class {
 	#name : #StNodeHelpTopic,
@@ -11,17 +13,11 @@ Class {
 	#instVars : [
 		'node'
 	],
+	#classInstVars : [
+		'locationCache'
+	],
 	#category : #'NewTools-DocumentationReader'
 }
-
-{ #category : #'instance creation' }
-StNodeHelpTopic class >> named: aName with: anIconBuilder [
-	| topic |
-	topic := self named: aName.
-	topic iconBuilder: anIconBuilder.
-	topic iconBuilder buildIcon: topic.
-	^ topic
-]
 
 { #category : #adding }
 StNodeHelpTopic >> addNode: aNode [
