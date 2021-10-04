@@ -145,11 +145,6 @@ StHelpBrowserPresenter >> connectPresenters [
 ]
 
 { #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromCache [
-	self createRootTopicFromFolder: self class helpCache.
-]
-
-{ #category : #internals }
 StHelpBrowserPresenter >> dummyHelp [
 
 	^  '# Empty Help
