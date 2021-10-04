@@ -20,6 +20,12 @@ StTopicFromGithubBuilderTest class >> eyeballTest [
 	StHelpBrowserPresenter openTopic: self new root.
 ]
 
+{ #category : #initialization }
+StTopicFromGithubBuilderTest >> initialize [
+	"Reset cache first time"
+	StTopicFromGithubBuilder reset.
+]
+
 { #category : #accessing }
 StTopicFromGithubBuilderTest >> root [
 	^ StTopicFromGithubBuilder githubTopics
