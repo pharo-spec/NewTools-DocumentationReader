@@ -1,18 +1,13 @@
 "
-I'm a help topic and as such I hold a Microdown root document. 
-This is in this document that further microdown elements will be added. 
+I'm a help topic and my content is a Microdown root document. 
 
 Note that I can have subtopics in addition to the microdown element. 
 A subtopic is just similar to myself.
 
-I store the location I was retrieved from. This location is used for caching of help topics
 "
 Class {
 	#name : #StNodeHelpTopic,
 	#superclass : #HelpTopic,
-	#instVars : [
-		'node'
-	],
 	#classInstVars : [
 		'locationCache'
 	],
@@ -22,7 +17,7 @@ Class {
 { #category : #adding }
 StNodeHelpTopic >> addNode: aNode [
 
-	node addChild: aNode
+	self node addChild: aNode
 ]
 
 { #category : #adding }
@@ -45,7 +40,7 @@ StNodeHelpTopic >> initialize [
 
 	super initialize.
 	self iconName: #pageIcon.
-	node := MicRootBlock new.
+	contents  := MicRootBlock new.
 ]
 
 { #category : #inspecting }
@@ -67,7 +62,7 @@ StNodeHelpTopic >> inspectionMCTopicTree [
 StNodeHelpTopic >> node [
 	"Returns the microdown elements holding the document of the help"
 	
-	^ node
+	^ self contents 
 ]
 
 { #category : #accessing }
