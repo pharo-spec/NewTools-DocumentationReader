@@ -294,7 +294,8 @@ StHelpBrowserPresenter >> initializePresenters [
 	 strings, not instances of Text (the fact that it works now is just casual, and will 
 	 be removed in the future)"
 	textOutput := self newMorph
-		morph: (RubScrolledTextMorph new 
+		morph: (RubScrolledTextMorph new
+			beWrapped;
 			hResizing: #spaceFill; 
 			vResizing: #spaceFill;
 			in: [ :this | this textArea readOnly: true ];
