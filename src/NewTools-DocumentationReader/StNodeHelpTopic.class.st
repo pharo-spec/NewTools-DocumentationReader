@@ -1,39 +1,29 @@
 "
-I'm a help topic and as such I hold a Microdown root document. 
-This is in this document that further microdown elements will be added. 
+I'm a help topic and my content is a Microdown root document. 
 
 Note that I can have subtopics in addition to the microdown element. 
 A subtopic is just similar to myself.
+
 "
 Class {
 	#name : #StNodeHelpTopic,
 	#superclass : #HelpTopic,
-	#instVars : [
-		'node',
-		'iconBuilder'
+	#classInstVars : [
+		'locationCache'
 	],
 	#category : #'NewTools-DocumentationReader'
 }
 
-{ #category : #'instance creation' }
-StNodeHelpTopic class >> named: aName with: anIconBuilder [
-	| topic |
-	topic := self named: aName.
-	topic iconBuilder: anIconBuilder.
-	topic iconBuilder buildIcon: topic.
-	^ topic
-]
-
 { #category : #adding }
 StNodeHelpTopic >> addNode: aNode [
 
-	node addChild: aNode
+	self node addChild: aNode
 ]
 
 { #category : #adding }
 StNodeHelpTopic >> addSubtopic: aSubTopic [
 
-	iconBuilder buildIcon: self.
+	self iconName: #bookIcon.
 	super addSubtopic: aSubTopic
 ]
 
@@ -45,24 +35,12 @@ StNodeHelpTopic >> addSubtopic: aHelpTopic with: aLevel [
 		ifFalse: [ self addSubtopic: aHelpTopic ]
 ]
 
-{ #category : #accessing }
-StNodeHelpTopic >> iconBuilder [ 
-	^ iconBuilder
-]
-
-{ #category : #accessing }
-StNodeHelpTopic >> iconBuilder: aIconBuilder [
-
-	iconBuilder := aIconBuilder
-]
-
 { #category : #initialize }
 StNodeHelpTopic >> initialize [
 
 	super initialize.
-	node := MicRootBlock new.
-	iconBuilder := StIconBookBuilder new.
-	iconBuilder setIconOf: self
+	self iconName: #pageIcon.
+	contents  := MicRootBlock new.
 ]
 
 { #category : #inspecting }
@@ -84,12 +62,12 @@ StNodeHelpTopic >> inspectionMCTopicTree [
 StNodeHelpTopic >> node [
 	"Returns the microdown elements holding the document of the help"
 	
-	^ node
+	^ self contents 
 ]
 
 { #category : #accessing }
 StNodeHelpTopic >> subtopics: aCollection [
 
-	iconBuilder buildIcon: self.
+	aCollection ifNotEmpty: [self iconName: #bookIcon].
 	super subtopics: aCollection
 ]

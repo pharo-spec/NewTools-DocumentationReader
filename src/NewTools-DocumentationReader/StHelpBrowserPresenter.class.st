@@ -36,8 +36,6 @@ Class {
 		'helpTopicVisitor'
 	],
 	#classInstVars : [
-		'filesystem',
-		'helpCache',
 		'lastopenHelp'
 	],
 	#category : #'NewTools-DocumentationReader'
@@ -60,84 +58,18 @@ StHelpBrowserPresenter class >> defaultSpec [
 			yourself
 ]
 
-{ #category : #accessing }
-StHelpBrowserPresenter class >> emptyHelpCache [
-
-	helpCache := nil
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> filesystem [
-	^ filesystem
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> filesystem: aFileSystem [
-	filesystem := aFileSystem
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> helpCache [
-
-	^ helpCache ifNil: [ helpCache := FileSystem memory workingDirectory ]
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter class >> helpCache: aCache [
-	helpCache := aCache
-]
-
-{ #category : #cache }
-StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
-
-	| fileRef |
-	fileRef := aFolderOrFile asFileReference.
-	self filesystem: FileSystem memory.
-	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory basename.
-	self helpCache: self filesystem workingDirectory / fileRef basename ] 
-		on: FileDoesNotExistException 
-		do: [  'We do not do anything special because the only thing we could do is to reinitialize
-and we may lose the contents if there was one.' ]
-]
-
-{ #category : #cache }
-StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderName [
-
-	aFolderOrFile isDirectory 
-		ifTrue:  [ | directoryPath |
-					directoryPath := aFolderName , '/' , aFolderOrFile basename.
-					self filesystem createDirectory: directoryPath.
-					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
-		ifFalse: [ | file filePath |
-					(self new isMicFile: aFolderOrFile) 
-						ifTrue: [ 
-							filePath := aFolderName , '/' , aFolderOrFile basename.
-							file := self filesystem workingDirectory / filePath.
-							file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ] ]
-]
-
 { #category : #'instance creation' }
 StHelpBrowserPresenter class >> open [
 	"Open a HelpBrowser on the internalized docs."
 	<example>
 
-	^ self openOnHelpFolder: self helpCache 
-]
-
-{ #category : #'instance creation' }
-StHelpBrowserPresenter class >> openOn: aHelpTopic [
-	"Open the receiver on the given help topic or any other object that can be transformed into
-	 a help topic by sending #asHelpTopic."
-
-	^ (self on:  aHelpTopic)
-		openWithSpec;
-		yourself
+	^ self error: 'We need to define a default starting point' 
 ]
 
 { #category : #'instance creation' }
 StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 	[ aDescription bookName.
-	 ^ self openOn: (CustomHelpHelpBuilder new createTopicFrom: aDescription)] 
+	 ^ self openTopic: (CustomHelpHelpBuilder new createTopicFrom: aDescription)] 
 	on: MessageNotUnderstood do: [ | inst |
 		inst:= self basicNew.
 		inst createTopicsFromCache.
@@ -151,33 +83,28 @@ StHelpBrowserPresenter class >> openOnCustomHelp: aDescription [
 ]
 
 { #category : #'instance creation' }
-StHelpBrowserPresenter class >> openOnHelpFolder [
-	"Open an help browser."
-	
-	self openOnHelpFolder: FileSystem workingDirectory / 'pharo-local' / 'doc'
+StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
+	"Open an help browser on a given folder."
 
-	
+	self openTopic: (StTopicFromFileFolderBuilder onDirectory: aFileReference )
 ]
 
 { #category : #'instance creation' }
-StHelpBrowserPresenter class >> openOnHelpFolder: aFileReference [
+StHelpBrowserPresenter class >> openPharoRepo [
+	"Open a HelpBrowser on the internalized docs."
+	<example>
 
-	"Open an help browser on a given folder."
+	self openTopic: (StTopicFromGithubBuilder githubTopics)
+]
 
-	"Implementation note: the logic is not really good because I have to copy the logic from SpPresenter class>>#newApplication:model:.
-	Especially how to pass a model before the initialization which is normally done via message #on: "
+{ #category : #'instance creation' }
+StHelpBrowserPresenter class >> openTopic: aHelpTopic [
+	"Open the receiver on the given help topic or any other object that can be transformed into
+	 a help topic by sending #asHelpTopic."
 
-	| fileReference |
-	lastopenHelp := self basicNew.
-	fileReference := aFileReference exists
-		ifFalse: [  self helpCache ]
-		ifTrue: [ aFileReference ].
-	lastopenHelp createRootTopicFromFolder: fileReference.
-	^ lastopenHelp
-		  setModelBeforeInitialization: lastopenHelp rootTopic;
-		  initialize;
-		  openWithSpec;
-		  yourself
+	^ (self on:  aHelpTopic)
+		openWithSpec;
+		yourself
 ]
 
 { #category : #'basic search' }
@@ -211,63 +138,10 @@ StHelpBrowserPresenter >> connectPresenters [
 ]
 
 { #category : #internals }
-StHelpBrowserPresenter >> createRootTopicFromFolder: aFolder [
-	| topic |
-	topic := (self createTopicsFromFileOrFolder: aFolder) first.
-	topic subtopics do: [ :each | self propagateNodeIn: each ].
-	self rootTopic: topic.
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromCache [
-	self createRootTopicFromFolder: self class helpCache.
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromFile: aFileOrFolder [
-
-	| visitor |
-	visitor := self helpTopicVisitor new.
-	visitor visit: (Microdown new resolvedTreeFromFile: aFileOrFolder).
-	^ visitor helpTopics subtopics
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> createTopicsFromFileOrFolder: aFileOrFolder [
-
-	| subTopic sorted topic |
-	(aFileOrFolder isFile and: [ self isMicFile: aFileOrFolder ]) 
-		ifTrue: [ ^ self createTopicsFromFile: aFileOrFolder ].
-
-	topic := self helpTopicClass named:
-		         aFileOrFolder basenameWithoutExtension capitalized.
-	sorted := self sortFileAndFolder: aFileOrFolder.
-	sorted do: [ :fileOrFolder | 
-		(self createTopicsFromFileOrFolder: fileOrFolder) do: [ :each | 
-			topic addSubtopic: each ] ].
-	subTopic := OrderedCollection new.
-	subTopic add: topic.
-	^ subTopic
-]
-
-{ #category : #internals }
 StHelpBrowserPresenter >> dummyHelp [
 
 	^  '# Empty Help
 	This a dummy help.'
-]
-
-{ #category : #hooks }
-StHelpBrowserPresenter >> helpTopicClass [
-
-	^ StNodeHelpTopic
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter >> helpTopicVisitor [
-	
-	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
-	^ helpTopicVisitor
 ]
 
 { #category : #accessing }
@@ -306,12 +180,6 @@ StHelpBrowserPresenter >> initializePresenters [
 
 ]
 
-{ #category : #testing }
-StHelpBrowserPresenter >> isMicFile: aFile [
-
-	^ #( 'mic' 'md' ) includes: aFile extension
-]
-
 { #category : #hooks }
 StHelpBrowserPresenter >> morphWriter [
 
@@ -321,18 +189,6 @@ StHelpBrowserPresenter >> morphWriter [
 { #category : #hooks }
 StHelpBrowserPresenter >> parserClass [ 
 	^ MicroDownParser
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> propagateNodeIn: aRootTopic [
-
-	aRootTopic node children ifEmpty: [ 
-		aRootTopic subtopics do: [ :each | 
-			self propagateNodeIn: each.
-			each node children do: [ :node |
-				aRootTopic addNode: node ]
-			 ] ]
-	
 ]
 
 { #category : #internals }
@@ -349,14 +205,9 @@ StHelpBrowserPresenter >> renderNode: aNode [
 	textOutput morph setText: (self morphWriter visit: aNode)
 ]
 
-{ #category : #accessing }
-StHelpBrowserPresenter >> rootTopic [
-	^ rootTopic ifNil: [ self rootTopic: (self helpTopicClass named: 'Help'). rootTopic ]
-]
-
-{ #category : #accessing }
-StHelpBrowserPresenter >> rootTopic: aHelpTopic [ 
-	rootTopic := aHelpTopic asHelpTopic
+{ #category : #initialization }
+StHelpBrowserPresenter >> rootTopic [ 
+	^ rootTopic 
 ]
 
 { #category : #search }
@@ -369,20 +220,8 @@ StHelpBrowserPresenter >> searchAndClick: aTopicName [
 ]
 
 { #category : #initialization }
-StHelpBrowserPresenter >> setModelBeforeInitialization: anHelpTopic [
-	
-	rootTopic := anHelpTopic
-]
-
-{ #category : #internals }
-StHelpBrowserPresenter >> sortFileAndFolder: aFileOrFolder [
-
-	| sorted |
-	sorted := SortedCollection sortBlock: [ :a :b | 
-		          a basename <= b basename ].
-	sorted addAll: (aFileOrFolder children select: [ :e | 
-			 e isDirectory or: [ self isMicFile: e ] ]).
-	^ sorted
+StHelpBrowserPresenter >> setModelBeforeInitialization: topic [
+	rootTopic := topic
 ]
 
 { #category : #initialization }
