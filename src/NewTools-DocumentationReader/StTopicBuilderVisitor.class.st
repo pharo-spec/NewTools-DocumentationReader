@@ -1,13 +1,12 @@
 "
 When I visit a header I create a `StNodeHelpTopic`.
-When I visit anything node I add the node at the last `StNodeHelpTopic` create.
+When I visit anything else I add the node at the last `StNodeHelpTopic` create.
 "
 Class {
 	#name : #StTopicBuilderVisitor,
 	#superclass : #MicrodownVisitor,
 	#instVars : [
 		'actualTopic',
-		'helpTopicVisitor',
 		'helpTopic'
 	],
 	#category : #'NewTools-DocumentationReader'
@@ -15,6 +14,7 @@ Class {
 
 { #category : #internals }
 StTopicBuilderVisitor >> extractNode: aNode into: aTopic [
+
 	aTopic owner ifNotNil: [ 
 		aTopic owner addNode: aNode.
 		self extractNode: aNode into: aTopic owner ]
@@ -26,6 +26,7 @@ StTopicBuilderVisitor >> extractNode: aNode into: aTopic [
 
 { #category : #accessing }
 StTopicBuilderVisitor >> helpTopic [
+
 	^ helpTopic
 ]
 
@@ -33,13 +34,6 @@ StTopicBuilderVisitor >> helpTopic [
 StTopicBuilderVisitor >> helpTopicClass [
 
 	^ StNodeHelpTopic
-]
-
-{ #category : #accessing }
-StTopicBuilderVisitor >> helpTopicVisitor [
-	
-	helpTopicVisitor ifNil: [ helpTopicVisitor := StTopicBuilderVisitor ].
-	^ helpTopicVisitor
 ]
 
 { #category : #initialization }

@@ -9,6 +9,7 @@ Class {
 
 { #category : #tests }
 StGithubDocSpecificationTest >> testUrlForDocFolder [
+
 	| spec |
 	spec := StGithubDocSpecification new branch: 'Pharo10'.
 	self 
@@ -18,6 +19,7 @@ StGithubDocSpecificationTest >> testUrlForDocFolder [
 
 { #category : #tests }
 StGithubDocSpecificationTest >> testUrlForFile [
+
 	| spec |
 	spec := StGithubDocSpecification new branch: 'Pharo10'.
 	self 

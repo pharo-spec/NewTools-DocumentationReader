@@ -1,3 +1,6 @@
+"
+I create a documentation for a class and such documentation that be displayed in a documentation reader.
+"
 Class {
 	#name : #StMicrodownClassAPIHelpBuilder,
 	#superclass : #HelpBuilder,
@@ -80,7 +83,7 @@ StMicrodownClassAPIHelpBuilder >> build [
 { #category : #'private building' }
 StMicrodownClassAPIHelpBuilder >> buildMethodTopicsOn: topic for: aClass [
 
-	|stream methodComment|
+	| stream methodComment |
 	stream := String new writeStream.
 	aClass selectors asSortedCollection do: [:selector | 
 		methodComment := (aClass>>selector) comment.
@@ -92,9 +95,10 @@ StMicrodownClassAPIHelpBuilder >> buildMethodTopicsOn: topic for: aClass [
 				nextPutAll: selector asString;
 				nextPutAll: '`';
 				cr.		
-
 		methodComment ifNil: [ methodComment := 'Method has no comment.' ].
-		stream nextPutAll: '_"'; nextPutAll: methodComment; nextPutAll: '"_';cr;cr ] ].
+		stream 
+			nextPutAll: '_"'; 
+			nextPutAll: methodComment; nextPutAll: '"_';cr;cr ] ].
 	
 	topic addNode: (MicroDownParser new parse: stream contents).
 	
@@ -146,7 +150,8 @@ StMicrodownClassAPIHelpBuilder >> buildSubnodesForSubclasses [
 ]
 
 { #category : #accessing }
-StMicrodownClassAPIHelpBuilder >> iconBuilder [ 
+StMicrodownClassAPIHelpBuilder >> iconBuilder [
+
 	^ iconBuilder
 ]
 
@@ -159,8 +164,6 @@ StMicrodownClassAPIHelpBuilder >> iconBuilder: aIconBuilder [
 { #category : #initialization }
 StMicrodownClassAPIHelpBuilder >> initialize [
 
-	"Initializes the receiver"
-
 	super initialize.
 	addSubclasses := false.
 	addMethods := true.
@@ -171,11 +174,13 @@ StMicrodownClassAPIHelpBuilder >> initialize [
 
 { #category : #accessing }
 StMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic [
+
 	^ subclassesAsSeparateTopic
 ]
 
 { #category : #accessing }
 StMicrodownClassAPIHelpBuilder >> subclassesAsSeparateTopic: anObject [
+
 	subclassesAsSeparateTopic := anObject
 ]
 

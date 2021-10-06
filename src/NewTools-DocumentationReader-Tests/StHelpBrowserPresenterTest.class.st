@@ -80,11 +80,12 @@ StHelpBrowserPresenterTest >> tearDown [
 { #category : #'tests - interaction' }
 StHelpBrowserPresenterTest >> testOpenIsWorkingSmokeTest [
 	"When this fails we have found a default way to open the help browser, then this test should be changed"
+	
 	| browser |
 	self 
 		should: [
 			browser := self presenterClass new.
-			window := browser openWithSpec]
+			window := browser openWithSpec ]
 		raise: Exception 
 ]
 

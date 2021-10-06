@@ -8,7 +8,7 @@ Class {
 	#category : #'NewTools-DocumentationReader'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #internals }
 StTopicMicrodownBuilder >> createTopicsFromDocument: doc [
 
 	| visitor |
@@ -25,6 +25,7 @@ StTopicMicrodownBuilder >> helpTopicVisitor [
 { #category : #internals }
 StTopicMicrodownBuilder >> liftNodesIn: aRootTopic [
 	"If root node (microdown document) is empty, lift nodes from subtopics into node of root"
+	
 	aRootTopic node children ifEmpty: [ 
 		aRootTopic subtopics do: [ :each | 
 			self liftNodesIn: each.

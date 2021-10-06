@@ -11,7 +11,7 @@ Class {
 	#category : #'NewTools-DocumentationReader-Tests'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'manual inspection' }
 StTopicFromFileFolderBuilderTest class >> eyeballTest [
 	"This should be able to open the HelpBrowser on the test data"
 	<script>
@@ -59,7 +59,9 @@ StTopicFromFileFolderBuilderTest >> createFilesIn: root from: anArray [
 
 { #category : #initialization }
 StTopicFromFileFolderBuilderTest >> fileContents: fileName [
-	^ self perform: (fileName copyReplaceAll: '.' with: '_' )asSymbol 
+	"We replace . by _ because the methods are named sunit_md."
+	
+	^ self perform: (fileName copyReplaceAll: '.' with: '_' ) asSymbol 
 	
 ]
 
@@ -75,7 +77,7 @@ StTopicFromFileFolderBuilderTest >> initializeTestFileStore [
 			sunitFramework.md
 	The subject files are made in the methods topic1Subject11 etc
 	"
-	docDir ifNotNil: [ ^docDir  ].
+	docDir ifNotNil: [ ^ docDir ].
 	docDir := self 
 		createFilesIn: FileSystem memory workingDirectory
 		from:  #( doc #(welcome 'welcome.md' 'contribute.md') #(sunit 'sunitFramework.md')).
@@ -84,6 +86,7 @@ StTopicFromFileFolderBuilderTest >> initializeTestFileStore [
 
 { #category : #running }
 StTopicFromFileFolderBuilderTest >> setUp [
+
 	super setUp.
 	self initializeTestFileStore.
 	rootTopic := StTopicFromFileFolderBuilder new createRootTopicFromFolder: docDir

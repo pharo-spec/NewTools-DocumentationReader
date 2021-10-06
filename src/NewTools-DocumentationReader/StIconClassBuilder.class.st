@@ -9,6 +9,7 @@ Class {
 
 { #category : #build }
 StIconClassBuilder >> buildIcon: aTopic [
-	aTopic title = 'Subclasses' ifTrue: [ ^ aTopic icon: (Smalltalk ui icons iconNamed: #hierarchy) ].
+	aTopic title = 'Subclasses' 
+		ifTrue: [ ^ aTopic icon: (self iconNamed: #hierarchy) ].
 	^ aTopic icon: (self class environment at: aTopic title asSymbol) systemIcon
 ]

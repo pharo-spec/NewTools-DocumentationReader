@@ -23,6 +23,7 @@ StTopicFromGithubBuilderTest class >> eyeballTest [
 { #category : #initialization }
 StTopicFromGithubBuilderTest >> initialize [
 	"Reset cache first time"
+	
 	StTopicFromGithubBuilder reset.
 ]
 

@@ -40,7 +40,7 @@ StNodeHelpTopic >> initialize [
 
 	super initialize.
 	self iconName: #pageIcon.
-	contents  := MicRootBlock new.
+	contents := MicRootBlock new
 ]
 
 { #category : #inspecting }
@@ -68,6 +68,6 @@ StNodeHelpTopic >> node [
 { #category : #accessing }
 StNodeHelpTopic >> subtopics: aCollection [
 
-	aCollection ifNotEmpty: [self iconName: #bookIcon].
+	aCollection ifNotEmpty: [ self iconName: #bookIcon ].
 	super subtopics: aCollection
 ]

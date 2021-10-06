@@ -3,6 +3,10 @@ I am able to build a topic tree from a root folder.
 
 The topic tree will have one root - based on the root folder.
 It will have subtropics based on subfoldes and the heading hiearchy of the markdown files in the folders.
+
+I'm usually invoked from `StHelpBrowserPresenter class>> #openOnHelpFolder:`
+
+	
 "
 Class {
 	#name : #StTopicFromFileFolderBuilder,
@@ -23,9 +27,10 @@ StTopicFromFileFolderBuilder class >> cache [
 	^ cache
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 StTopicFromFileFolderBuilder class >> onDirectory: fileReference [
-	"return a topic from fileRefence (assumed to be a folder)"
+	"Return a topic from fileRefence (assumed to be a folder)"
+
 	^ self cache at: fileReference ifAbsentPut: [ self new createRootTopicFromFolder: fileReference]
 ]
 
@@ -78,11 +83,13 @@ StTopicFromFileFolderBuilder >> isMicFile: aFile [
 
 { #category : #accessing }
 StTopicFromFileFolderBuilder >> rootTopic [
+
 	^ rootTopic ifNil: [ self rootTopic: (self helpTopicClass named: 'Help'). rootTopic ]
 ]
 
 { #category : #accessing }
-StTopicFromFileFolderBuilder >> rootTopic: aHelpTopic [ 
+StTopicFromFileFolderBuilder >> rootTopic: aHelpTopic [
+
 	rootTopic := aHelpTopic asHelpTopic
 ]
 

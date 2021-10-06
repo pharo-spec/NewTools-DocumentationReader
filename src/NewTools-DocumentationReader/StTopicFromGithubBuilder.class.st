@@ -1,6 +1,6 @@
 "
 I am read the microdown files in the pharo-project/pharo/doc folder. 
-From these files I create a topic hiearachy.
+From these files I create a topic hierarchy.
 
 My implementation is suffering from the structure of the github api, which do not return a folder tree, but a list of folders. 
 In the key method `buildSubtopics: pathCollection level: level` the pathCollection and level is a approximation of a folder. Level 3 and path collection:
@@ -30,16 +30,18 @@ Class {
 
 { #category : #accessing }
 StTopicFromGithubBuilder class >> githubTopics [
-	"return the root topic for the pharo documentation"
+	"Return the root topic for the pharo documentation"
+	
 	^ self githubTopicsFrom: (StGithubDocSpecification new branch: 'Pharo10')
 ]
 
 { #category : #accessing }
 StTopicFromGithubBuilder class >> githubTopicsFrom: aDocSpec [
 	"aDocSpec is an instance of StGithubDocSpecifcation"
-	^cache 
+	
+	^ cache 
 		at: aDocSpec printString 
-		ifAbsentPut:  [ (self new docSpec: aDocSpec)  buildTopics].
+		ifAbsentPut:  [ (self new docSpec: aDocSpec) buildTopics].
 ]
 
 { #category : #accessing }
@@ -57,6 +59,7 @@ StTopicFromGithubBuilder class >> reset [
 { #category : #private }
 StTopicFromGithubBuilder >> buildSubtopics: pathCollection level: level [
 	"I assume pachCollection shares path below level"
+	
 	| subDirectories subTopics |
 	subDirectories := pathCollection select: [ :p | p size >= level ].
 	subDirectories := subDirectories groupedBy: [ :p | p at: (level)].
@@ -67,8 +70,8 @@ StTopicFromGithubBuilder >> buildSubtopics: pathCollection level: level [
 { #category : #private }
 StTopicFromGithubBuilder >> buildTopic: pathCollection level: level [
 	"I assume collectionOfPaths to share a root"
-	| docTopics subTopics topic |
 	
+	| docTopics subTopics topic |
 	docTopics := self getFiles: (pathCollection select: [ :p | p size = level ]).
 	subTopics := docTopics , (self buildSubtopics: pathCollection level: level + 1).
 	subTopics size = 1 
@@ -82,7 +85,8 @@ StTopicFromGithubBuilder >> buildTopic: pathCollection level: level [
 { #category : #'public-api' }
 StTopicFromGithubBuilder >> buildTopics [
 	"I return a topic (with subtopics) read from the pharo-project repository on github"
-	| root subTopics|
+	
+	| root subTopics |
 	[ :job |
 		readingJob := job.
 		jobCounter := 1.
@@ -112,6 +116,7 @@ StTopicFromGithubBuilder >> docSpec: anObject [
 StTopicFromGithubBuilder >> documentForPath: aPath [
 	"https://raw.githubusercontent.com/pharo-project/pharo/Pharo10/doc/Epicea/1-Epicea.md"
 	"aPath is the stuff after the doc/"
+	
 	|url response doc |
 	readingJob title: aPath segments last.
 	url := docSpec urlForFile: aPath pathString.
@@ -125,10 +130,11 @@ StTopicFromGithubBuilder >> documentForPath: aPath [
 { #category : #private }
 StTopicFromGithubBuilder >> getFiles: pathCollection [
 	"Return an OrderedCollection of documents in the pathCollection"
+	
 	^ (pathCollection collect: [ :path | self documentForPath: path ]) flattened.
 ]
 
-{ #category : #accessing }
+{ #category : #initialization }
 StTopicFromGithubBuilder >> initialize [ 
 	super initialize.
 	docSpec := StGithubDocSpecification new branch: 'Pharo10'.
@@ -136,13 +142,15 @@ StTopicFromGithubBuilder >> initialize [
 
 { #category : #private }
 StTopicFromGithubBuilder >> locationFrom: pathCollection level: level [
+
 	^ (pathCollection first segments copyFrom: 1 to: level) joinUsing: '/'
 ]
 
 { #category : #private }
 StTopicFromGithubBuilder >> pharoDocPaths [
 	"I return an ordered collection of paths for documents in the doc tree"
-	|folderUrl docURL json|
+	
+	| folderUrl docURL json |
 	"get the files in the pharo-project repository"
 	folderUrl := docSpec urlForDocFolder.
 	json := STONJSON fromString: (githubClientConnection get: folderUrl).

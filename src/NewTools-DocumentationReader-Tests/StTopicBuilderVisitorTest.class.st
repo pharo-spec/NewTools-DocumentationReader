@@ -94,7 +94,6 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorVisitHeaderAtLevel2 [
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 
 	|  topic |
-	
 	topic := self topicIn: self class spFileContentsLevelsSections.
 	self assert: topic subtopics first title equals: 'Section 1'.
 	self assert: topic subtopics first subtopics first title equals: 'Section 2'.
@@ -102,6 +101,7 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithLevelsSections [
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
+
 	| topic |
 	topic := self topicIn: self class spFileContentsMoreSections.
 	self assert: topic subtopics second title equals: 'Section 2'.
@@ -110,8 +110,8 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSections [
 
 { #category : #tests }
 StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithMoreSubSection [
-	| topic |
-	
+
+	| topic |	
 	topic := self topicIn: self class spFileContentsWithMoreSubSection.
 	self
 		assert: (topic subtopics first subtopics second) title
@@ -143,6 +143,7 @@ StTopicBuilderVisitorTest >> testTopicBuilderVisitorWithOneSubSection [
 
 { #category : #helper }
 StTopicBuilderVisitorTest >> topicIn: aString [
+
 	| visitor |
 	visitor := StTopicBuilderVisitor new.
 	visitor visit: (MicroDownParser new parse: aString).
