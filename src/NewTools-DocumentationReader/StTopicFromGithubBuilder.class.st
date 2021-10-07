@@ -1,6 +1,8 @@
 "
 I am read the microdown files in the pharo-project/pharo/doc folder. 
 From these files I create a topic hierarchy.
+In addition I cache the resulting parsed files. 
+
 
 My implementation is suffering from the structure of the github api, which do not return a folder tree, but a list of folders. 
 In the key method `buildSubtopics: pathCollection level: level` the pathCollection and level is a approximation of a folder. Level 3 and path collection:

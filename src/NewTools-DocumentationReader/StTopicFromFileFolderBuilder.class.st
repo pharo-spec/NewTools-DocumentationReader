@@ -2,7 +2,7 @@
 I am able to build a topic tree from a root folder.
 
 The topic tree will have one root - based on the root folder.
-It will have subtropics based on subfoldes and the heading hiearchy of the markdown files in the folders.
+It will have subtropics based on subfoldes and the heading hiearchy of the markdown files in the folders. In addition I cache the resulting parsed files. 
 
 I'm usually invoked from `StHelpBrowserPresenter class>> #openOnHelpFolder:`
 
