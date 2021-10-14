@@ -93,7 +93,7 @@ StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile [
 	| fileRef |
 	fileRef := aFolderOrFile asFileReference.
 	self filesystem: FileSystem memory.
-	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory basename.
+	[ self internalizeHelpFrom: fileRef at: filesystem workingDirectory.
 	self helpCache: self filesystem workingDirectory / fileRef basename ] 
 		on: FileDoesNotExistException 
 		do: [  'We do not do anything special because the only thing we could do is to reinitialize
@@ -101,18 +101,18 @@ and we may lose the contents if there was one.' ]
 ]
 
 { #category : #cache }
-StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderName [
+StHelpBrowserPresenter class >> internalizeHelpFrom: aFolderOrFile  at: aFolderReference [
 
 	aFolderOrFile isDirectory 
 		ifTrue:  [ | directoryPath |
-					directoryPath := aFolderName , '/' , aFolderOrFile basename.
+					directoryPath := aFolderReference / aFolderOrFile basename.
 					self filesystem createDirectory: directoryPath.
 					aFolderOrFile children do: [ :folderOrFile | self internalizeHelpFrom: folderOrFile  at: directoryPath ] ]
 		ifFalse: [ | file filePath |
 					(self new isMicFile: aFolderOrFile) 
 						ifTrue: [ 
-							filePath := aFolderName , '/' , aFolderOrFile basename.
-							file := self filesystem workingDirectory / filePath.
+							filePath := aFolderReference / aFolderOrFile basename.
+							file := self filesystem workingDirectory resolve: filePath.
 							file writeStreamDo: [ :stream |stream nextPutAll: aFolderOrFile contents ] ] ]
 ]
 
