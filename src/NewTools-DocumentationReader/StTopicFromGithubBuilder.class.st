@@ -31,6 +31,12 @@ Class {
 }
 
 { #category : #accessing }
+StTopicFromGithubBuilder class >> cache [
+	cache ifNil: [ cache := Dictionary new ].
+	^ cache
+]
+
+{ #category : #accessing }
 StTopicFromGithubBuilder class >> githubTopics [
 	"Return the root topic for the pharo documentation"
 	
@@ -41,7 +47,7 @@ StTopicFromGithubBuilder class >> githubTopics [
 StTopicFromGithubBuilder class >> githubTopicsFrom: aDocSpec [
 	"aDocSpec is an instance of StGithubDocSpecifcation"
 	
-	^ cache 
+	^ self cache 
 		at: aDocSpec printString 
 		ifAbsentPut:  [ (self new docSpec: aDocSpec) buildTopics].
 ]
