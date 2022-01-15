@@ -35,9 +35,6 @@ Class {
 		'topicList',
 		'helpTopicVisitor'
 	],
-	#classInstVars : [
-		'lastopenHelp'
-	],
 	#category : #'NewTools-DocumentationReader'
 }
 
@@ -51,10 +48,10 @@ StHelpBrowserPresenter class >> defaultSpec [
 				add: #topicList;
 				add: #textOutput;
 				yourself);
-			add: searchInput height: 30 ;
+			"add: searchInput height: 30 ;
 			add: (SpButtonPresenter new
 				label: 'Search';
-				action: [ lastopenHelp searchAndClick: searchInput text ]) height: 50;
+				action: [ lastopenHelp searchAndClick: searchInput text ]) height: 50;"
 			yourself
 ]
 
