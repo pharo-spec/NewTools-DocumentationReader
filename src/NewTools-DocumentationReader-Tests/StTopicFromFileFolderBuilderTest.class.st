@@ -67,16 +67,7 @@ StTopicFromFileFolderBuilderTest >> fileContents: fileName [
 
 { #category : #initialization }
 StTopicFromFileFolderBuilderTest >> initializeTestFileStore [
-	"I return a file reference to the root of the test file directory"
-	"My structure is:
-	doc
-		welcome
-			welcome.md
-			contribute.md
-		sunit
-			sunitFramework.md
-	The subject files are made in the methods topic1Subject11 etc
-	"
+
 	docDir ifNotNil: [ ^ docDir ].
 	docDir := self 
 		createFilesIn: FileSystem memory workingDirectory
