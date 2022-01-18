@@ -4,21 +4,8 @@ A StTopicFromGithubBuilderTest is a test class for testing the behavior of StTop
 Class {
 	#name : #StTopicFromGithubBuilderTest,
 	#superclass : #TestCase,
-	#instVars : [
-		'root'
-	],
-	#classInstVars : [
-		'root'
-	],
 	#category : #'NewTools-DocumentationReader-Tests'
 }
-
-{ #category : #'as yet unclassified' }
-StTopicFromGithubBuilderTest class >> eyeballTest [
-	"This should be able to open the HelpBrowser on the test data (actual data from github)"
-	<script>
-	StHelpBrowserPresenter openTopic: self new root.
-]
 
 { #category : #initialization }
 StTopicFromGithubBuilderTest >> initialize [

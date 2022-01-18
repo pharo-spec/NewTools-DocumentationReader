@@ -8,9 +8,6 @@ A subtopic is just similar to myself.
 Class {
 	#name : #StNodeHelpTopic,
 	#superclass : #HelpTopic,
-	#classInstVars : [
-		'locationCache'
-	],
 	#category : #'NewTools-DocumentationReader'
 }
 

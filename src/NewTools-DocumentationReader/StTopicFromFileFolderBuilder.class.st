@@ -12,8 +12,7 @@ Class {
 	#name : #StTopicFromFileFolderBuilder,
 	#superclass : #StTopicMicrodownBuilder,
 	#instVars : [
-		'rootTopic',
-		'helpTopicVisitor'
+		'rootTopic'
 	],
 	#classInstVars : [
 		'cache'
@@ -50,8 +49,10 @@ StTopicFromFileFolderBuilder >> createRootTopicFromFolder: aFolder [
 ]
 
 { #category : #internals }
-StTopicFromFileFolderBuilder >> createTopicsFromFile: aFileOrFolder [
-	^ self createTopicsFromDocument:  (Microdown new resolvedTreeFromFile: aFileOrFolder).
+StTopicFromFileFolderBuilder >> createTopicsFromFile: aFileReference [
+	| ref |
+	ref := MicFileResourceReference fromFileRef: aFileReference.
+	^ self createTopicsFromDocument:  ref loadMicrodown .
 ]
 
 { #category : #internals }
